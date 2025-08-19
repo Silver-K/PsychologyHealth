@@ -1,0 +1,1 @@
+import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{a as o,o as c}from"./index-COYtomWE.js";const t={},s={class:"demo"};function r(_,a){return c(),o("div",s)}const m=e(t,[["render",r],["__scopeId","data-v-435b8dcb"]]);export{m as default};

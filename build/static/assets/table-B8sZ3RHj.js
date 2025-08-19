@@ -1,0 +1,1 @@
+function d(a,n,c){const{keys:r,renderer:l,width:e,titleObj:s}=a,f=n?[n].flat():[],i=c?[c].flat():[];return f.concat(r.map((t,o)=>({key:`col-${o+1}`,dataKey:t,title:s[t],width:typeof e=="function"?e(t,o):e,cellRenderer:l(t)}))).concat(i)}export{d as g};

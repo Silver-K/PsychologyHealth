@@ -1,0 +1,185 @@
+<script lang="tsx" setup>
+import { ref, watch, computed } from 'vue';
+import { ElButton, ElInput, ElRadioGroup, ElRadio } from 'element-plus';
+import { minorsEditorItems, MinorsLabels, radioLookupMap, type MinorItemT } from '~/schemas/minors';
+import { genEmptyMinorInfo } from '~/stores/minors';
+import MultipleTextarea from '~comp/MultipleTextarea.vue';
+import MultiFileInput from '~comp/MultiFileInput.vue';
+import type { MinorInfoT } from '~/types/minors';
+import { cloneDeep } from 'lodash-es';
+
+interface PropT {
+  inputMode?: boolean;
+  form?: MinorInfoT;
+}
+const props = defineProps<PropT>();
+
+const form = ref<MinorInfoT>(props.form || genEmptyMinorInfo());
+const initForm = ref(form.value);
+
+interface EmitsT {
+  (evt: 'submit', value: MinorInfoT | undefined): void;
+  (evt: 'view-psy-test'): void;
+  (evt: 'update:form', value: MinorInfoT): void;
+}
+const emits = defineEmits<EmitsT>();
+watch(form, (f) => {
+  emits('update:form', f);
+}, {
+  deep: true,
+})
+const isInputMode = ref(props.inputMode ? true : false);
+watch(isInputMode, (inInputMode) => {
+  if (inInputMode) {
+    initForm.value = cloneDeep(form.value);
+  }
+});
+const inputModeItems = computed(() => {
+  return isInputMode.value ? minorsEditorItems.filter((i) => i.editor !== 'complex') : minorsEditorItems.slice();
+});
+
+type FormKey = keyof typeof form['value']
+function submit() {
+  emits('submit', form.value);
+  isInputMode.value = false;
+}
+function viewPsyTest() {
+  emits('view-psy-test');
+}
+function reset() {
+  form.value = cloneDeep(initForm.value);
+}
+function enterInputMode() {
+  isInputMode.value = true;
+}
+function leaveInputMode() {
+  reset();
+  isInputMode.value = false;
+}
+
+function isTempProtectKey(key: keyof MinorInfoT): key is 'tempProtect' {
+  return key === 'tempProtect';
+}
+const transformShowText = <T extends keyof MinorInfoT>(key: T) => {
+  if (isTempProtectKey(key)) {
+    const value = form.value[key];
+    return value ? '是' : '否';
+  } else {
+    return form.value[key];
+  }
+}
+// 'input' | 'radio' | 'textarea' | 'textareas' | 'file' | 'complex'
+const componentsMap = {
+  input: (key: FormKey) => {
+    return (<ElInput v-model={form.value[key]} />);
+  },
+  radio: (key: FormKey) => {
+    return (
+      <ElRadioGroup v-model={form.value[key]}>
+        {
+          radioLookupMap[key as keyof typeof radioLookupMap].map((label) => (
+            <ElRadio value={label}>{ label }</ElRadio>
+          ))
+        }
+      </ElRadioGroup>
+    )    
+  },
+  textarea: (key: FormKey) => {
+    return (<ElInput type="textarea" v-model={form.value[key]} />);
+  },
+  textareas: (key: FormKey) => {
+    return (<MultipleTextarea inputMode={isInputMode.value} v-model={form.value[key]} />);
+  },
+  file: (key: FormKey) => {
+    return (<MultiFileInput inputMode={isInputMode.value} v-model:files={form.value[key]} />);
+  },
+  complex: () => {
+    return;
+  },
+}
+const infoCompMap = {
+  input: (key: FormKey) => {
+    return (<span>{form.value[key]}</span>);
+  },
+  radio: (key: FormKey) => {
+    return (
+      <span>{transformShowText(key)}</span>
+    )    
+  },
+  textarea: (key: FormKey) => {
+    return (<div class="text-info">{form.value[key]}</div>);
+  },
+  textareas: (key: FormKey) => {
+    return (<MultipleTextarea inputMode={isInputMode.value} v-model={form.value[key]} />);
+  },
+  file: (key: FormKey) => {
+    return (<MultiFileInput has-download inputMode={isInputMode.value} v-model:files={form.value[key]} />);
+  },
+  complex: () => {
+    return (<ElButton onClick={viewPsyTest}>查看详情</ElButton>);
+  },
+}
+const FormInputRender = ({ 'minor-item': minorItem }: { 'minor-item': MinorItemT}) => {
+  const { key, editor } = minorItem;
+
+  return componentsMap[editor](key);
+}
+const InfoRender = ({ 'minor-item': minorItem }: { 'minor-item': MinorItemT}) => {
+  const { key, editor } = minorItem;
+
+  return infoCompMap[editor](key);
+}
+</script>
+<template>
+  <div v-if="!props.inputMode" class="operators">
+    <div class="railway">
+      <ElButton v-if="isInputMode" @click="leaveInputMode" class="btn">放弃</ElButton>
+      <ElButton v-else @click="enterInputMode" type="primary" class="btn">编辑</ElButton>
+      <ElButton v-if="isInputMode" type="warning" @click="reset" class="btn">重置</ElButton>
+      <ElButton v-if="isInputMode" type="primary" @click="submit" class="btn">保存</ElButton>
+    </div>
+  </div>
+  <div class="minor-input">
+    <ElForm class="content" :model="form" label-width="auto">
+      <ElFormItem v-for="item in inputModeItems" :key="item.key" :label="MinorsLabels[item.key]">
+        <!-- 可输入模式 -->
+        <template v-if="isInputMode">
+          <FormInputRender :minor-item="item" />
+        </template>
+        <!-- 展示 -->
+        <template v-else>
+          <InfoRender :minor-item="item"/>
+        </template>
+      </ElFormItem>
+    </ElForm>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.operators {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 1;
+}
+.railway {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  box-shadow: inset 0px -1px 4px 1px rgba(var(--wh-black), 0.2);
+  border-radius: 4px;
+  background-color: rgba(var(--wh-white), 0.65);
+  backdrop-filter: blur(4px);
+}
+.operators + .content {
+  margin-top: 8px;
+}
+.btn {
+  + .btn {
+    margin-top: 12px;
+    margin-left: 0px;
+  }
+}
+</style>

@@ -1,0 +1,92 @@
+:root {
+  --wh-white: 255,255,255;
+  --wh-black: 0,0,0;
+  --wh-brand: 235,55,55;
+  --wh-primary: 0,135,235;
+  --wh-success: 13,205,13;
+  --wh-success-secondary: 33,155,33;
+  --wh-bg: 236,236,236;
+  --wh-bg-light: 255,255,255;
+
+  --wh-color-white: rgb(var(--wh-white));
+  --wh-color-black: rgb(var(--wh-black));
+  --wh-color-brand: rgb(var(--wh-brand));
+  --wh-color-primary: rgb(var(--wh-primary));
+  --wh-color-text: rgba(var(--wh-black), 0.8);
+  --wh-color-text-inverse: rgba(var(--wh-white), 1);
+  --wh-color-text-hover: rgba(var(--wh-black), 0.6);
+  --wh-color-text-primary-hover: rgba(var(--wh-primary), 0.6);
+  --wh-color-tip: rgba(var(--wh-black), 0.5);
+  --wh-color-text-disabled: rgba(var(--wh-black), 0.2);
+
+  --wh-color-success: rgba(var(--wh-success), 1);
+  --wh-color-success-secondary: rgba(var(--wh-success-secondary), 1);
+  --wh-color-bg: rgba(var(--wh-bg), 0.9);
+  --wh-color-bg-light: rgba(var(--wh-bg-light), 1);
+}
+* {
+  box-sizing: border-box;
+}
+html, body {
+  font-size: 14px;
+  line-height: 22px;
+  background-color: rgba(var(--wh-black), 0.1);
+}
+h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+  text-indent: 0;
+}
+ul, ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+a {
+  text-decoration: none;
+}
+a:visited {
+  color: inherit;
+}
+.reverse {
+  transform: rotate(180deg);
+}
+.clickable {
+  cursor: pointer;
+}
+.text-hoverable {
+  color: var(--wh-color-text);
+}
+.text-hoverable:hover {
+  color: var(--wh-color-text-hover);
+}
+.text-hoverable-primary:hover {
+  color: var(--wh-color-text-primary-hover);
+}
+.text-primary {
+  color: var(--wh-color-primary);
+}
+.text-disabled {
+  color: var(--wh-color-text-disabled);
+  cursor: not-allowed;
+}
+.text-disabled:hover {
+  color: var(--wh-color-text-disabled);
+  cursor: not-allowed;
+}
+.gap-12 {
+  margin-left: 12px;
+  margin-right: 12px;
+}
+.gap-12 + .gap-12 {
+  margin-left: 0px;
+}
+.gap-12:first-child {
+  margin-left: 0px;
+}
+.gap-12:last-child {
+  margin-right: 0px;
+}
+.el-dialog {
+  --el-dialog-width: 80%;
+}
