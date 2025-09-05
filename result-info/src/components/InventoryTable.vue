@@ -3,16 +3,20 @@ import { computed, ref } from 'vue';
 import MultiFileInput from './MultiFileInput.vue';
 import { inventoryTableKeys, InventoryLabels } from '~/schemas/inventory';
 import { generateCols } from '~/helpers/table';
-import { addInventoryInfo, genEmptyInventoryInfo, getInventoryInfo, removeInventoryItem, setInventoryInfo } from '~/stores/inventory';
+import { addInventoryInfo, genEmptyInventoryInfo, getInventoryInfo, removeInventoryItem, modifyInventoryInfo } from '~/stores/inventory';
 
 import type { InventoryInfoT } from '~/types/inventory';
 import { ElDropdown, ElDropdownItem, ElDropdownMenu, ElMessage, ElMessageBox } from 'element-plus';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
-import type { FileInfoT } from '~/types/file';
 import { downloadFile, getType } from '~/helpers/utils';
 import { throttle } from 'lodash-es';
+import type { FileInfoT } from 'shared';
 
-const data = ref(getInventoryInfo());
+const data = ref();
+async function updateData() {
+  data.value = await getInventoryInfo();
+}
+updateData();
 
 const isFileUpload = ref(false);
 const uploadFiles = ref<FileInfoT[]>([]);
@@ -67,20 +71,6 @@ function download(item: InventoryInfoT) {
   downloadableFiles.value = item.files.map((f) => ({ ...f }));
 }
 function abortFileOperate() {
-  fileDialogVisible.value = false;
-}
-function confirmFileOperate() {
-  if (isFileUpload.value) {
-    const found = data.value.find((i) => i.id === currentInventoryId.value);
-    if (found) {
-      found.files = uploadFiles.value;
-      setInventoryInfo(data.value);
-    }
-  } else {
-    willDownloadFiles.value.forEach((file) => {
-      downloadFile(`/api/files/download/${file.filename}`, file.name);
-    })
-  }
   fileDialogVisible.value = false;
 }
 
@@ -160,23 +150,6 @@ function saveAdd() {
     ElMessage.success("暂存成功");
   }
 }
-function handleAddInventoryInfo() {
-  const result = addInventoryInfo(addForm.value);
-  if (result === 0) {
-    ElMessage({
-      message: '录入成功',
-      type: 'success'
-    });
-    closeAddDialog();
-    removeSave();
-  } else {
-    ElMessage({
-      message: '录入失败',
-      type: 'error',
-    })
-  }
-  data.value = getInventoryInfo();
-}
 
 const searchVal = ref('');
 const updateSearchData = (val: string) => {
@@ -197,6 +170,39 @@ async function del(item: InventoryInfoT) {
   });
   removeInventoryItem(item.id);
   search();
+}
+async function handleAddInventoryInfo() {
+  const result = await addInventoryInfo(addForm.value);
+  if (result === 0) {
+    ElMessage({
+      message: '录入成功',
+      type: 'success'
+    });
+    closeAddDialog();
+    removeSave();
+  } else {
+    ElMessage({
+      message: '录入失败',
+      type: 'error',
+    })
+  }
+  search();
+}
+async function confirmFileOperate() {
+  if (isFileUpload.value) {
+    await modifyInventoryInfo(currentInventoryId.value, {
+      files: uploadFiles.value.map((item) => ({
+        filename: item.filename,
+        name: item.name,
+      }))
+    });
+    search();
+  } else {
+    willDownloadFiles.value.forEach((file) => {
+      downloadFile(`/api/files/download/${file.filename}`, file.name);
+    })
+  }
+  fileDialogVisible.value = false;
 }
 </script>
 
@@ -244,7 +250,7 @@ async function del(item: InventoryInfoT) {
 
       <ElButton class="record-btn" type="primary" @click="openAddDialog">录入</ElButton>
     </div>
-    <div class="table">
+    <div v-if="data" class="table">
       <ElAutoResizer>
         <template #default="{ width, height }">
           <ElTableV2

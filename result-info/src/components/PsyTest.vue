@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { ComposePsyData, FileServe, StaticFile } from '~/types/minors';
+import type { ComposePsyData, FileServe, StaticFile } from 'shared';
 import { PsyTestLabels } from '~/schemas/minors';
 import LineChart from '~comp/LineChart.vue';
 import MultiFileInput from '~comp/MultiFileInput.vue';
@@ -20,7 +20,7 @@ const props = computed(() => Object.keys(originProps).reduce((acc, cur) => {
 }, Object.create(null) as ComposePsyData));
 interface EmitsT {
   (evt: 'add', key: ComposeKeys, value: StaticFile): void;
-  (evt: 'edit', key: ComposeKeys, index: number, value: StaticFile): void;
+  (evt: 'edit', key: ComposeKeys, value: StaticFile): void;
 }
 const emits = defineEmits<EmitsT>();
 
@@ -48,6 +48,7 @@ const showDataEndIndex = ref<Record<ComposeKeys, number>>({
 });
 for (const prop in props.value) {
   const property: ComposeKeys = prop as ComposeKeys;
+  let len = prop.length;
   watch(() => props.value[property], (item) => {
     if (!Array.isArray(item) || item.length === 0) {
       return;
@@ -55,7 +56,8 @@ for (const prop in props.value) {
     if (showDataStartIndex.value[property] === -1) {
       showDataStartIndex.value[property] = 0;
     }
-    if (showDataEndIndex.value[property] === -1) {
+    if (showDataEndIndex.value[property] === -1 || item.length > len) {
+      len = item.length;
       showDataEndIndex.value[property] = item.length - 1;
     }
   }, {
@@ -104,6 +106,7 @@ const emptyForm = {
   tag: '',
   value: 0,
   files: [],
+  id: '',
 }
 const form = ref<StaticFile>({
   ...emptyForm
@@ -164,9 +167,9 @@ const cancelAddOrEdit = () => {
 }
 const confirmAddOrEdit = () => {
   if (operateType.value === 'add') {
-    emits('add', operateKey.value, form.value)
+    emits('add', operateKey.value, form.value);
   } else {
-    emits('edit', operateKey.value, operateIndex.value, form.value);
+    emits('edit', operateKey.value, form.value);
   }
   operatorDlgOpen.value = false;
   form.value = emptyForm;

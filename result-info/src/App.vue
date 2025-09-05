@@ -16,11 +16,11 @@ if (!window['_resize_']) {
 const router = useRouter();
 
 router.beforeEach((to) => {
-  if (to.path !== '/auth') {
+  if (to.path !== '/auth' && to.path !== '/icons') {
     const fail = requestAuth();
     if (fail) {
       ElMessage({
-        message: '登录凭证已过期，请重新登录',
+        message: '登录已失效，请重新登录',
         type: 'warning'
       })
       return '/auth';

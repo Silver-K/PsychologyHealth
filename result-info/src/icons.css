@@ -1,0 +1,36 @@
+.icon-user {
+  --icon: '\f500';
+}
+.icon-pie {
+  --icon: '\f200';
+}
+.icon-calendar {
+  --icon: '\f073';
+}
+.icon-static {
+  --icon: '\f080';
+}
+.icon-plus {
+  --icon: '\f055';
+}
+.icon-del {
+  --icon: '\f056';
+}
+.icon-location {
+  --icon: '\f3c5';
+}
+.icon-home {
+  --icon: '\f015';
+}
+.icon-warning {
+  --icon: '\f071';
+}
+.icon-person {
+  --icon: '\f1ae';
+}
+.icon-gender {
+  --icon: '\f228';
+}
+.icon-shield {
+  --icon: '\f3ed';
+}

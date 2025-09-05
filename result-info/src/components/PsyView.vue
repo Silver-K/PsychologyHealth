@@ -1,48 +1,31 @@
 <script lang="ts" setup>
 import { useRoute } from 'vue-router';
 import PsyTest from './PsyTest.vue';
-import { getMinorInfo, setMinorInfo } from '~/stores/minors';
-import type { MinorInfoT, StaticFile } from '~/types/minors';
+import { getMinorInfo, editPsyTestInfo, addPsyTestInfo } from '~/stores/minors';
+import type { ComposePsyData, MinorInfoT, StaticFile } from 'shared';
 import { ref } from 'vue';
 
 const route = useRoute();
-const { id } = route.params;
-function getDetailData(id: string) {
-  const data = getMinorInfo();
-  if (Array.isArray(data)) {
-    const found = data.find((i) => i.id === id);
-    if (found) {
-      return found;
-    }
-    return null;
-  } else {
-    return null;
+const { id } = route.params as { id: string };
+
+const detailData = ref<MinorInfoT | null>(null);
+async function updateData() {
+  const [data] = await getMinorInfo(void 0, { id });
+  detailData.value = data;
+}
+updateData();
+
+const handleAdd = async (key: keyof ComposePsyData, form: StaticFile) => {
+  const result = await addPsyTestInfo(id, key, form);
+  if (result === 0) {
+    updateData();
   }
 }
-const detailData = ref<MinorInfoT | null>(null);
-detailData.value = getDetailData(String(id));
-
-const handleAdd = (key: keyof MinorInfoT['psyTest'], form: StaticFile) => {
-  const data = getMinorInfo();
-  if (Array.isArray(data)) {
-    const found = data.find((i) => i.id === id);
-    if (found) {
-      found.psyTest[key].push(form);
-      setMinorInfo(data);
-      detailData.value = getDetailData(String(id));
-    }
-  }    
-}
-const handleEdit = (key: keyof MinorInfoT['psyTest'], index: number, form: StaticFile) => {
-const data = getMinorInfo();
-  if (Array.isArray(data)) {
-    const found = data.find((i) => i.id === id);
-    if (found && found.psyTest) {
-      found.psyTest[key][index] = form;
-      setMinorInfo(data);
-      detailData.value = getDetailData(String(id));
-    }
-  } 
+const handleEdit = async (key: keyof ComposePsyData, form: StaticFile) => {
+  const result = await editPsyTestInfo(id, key, form.id, form);
+  if (result === 0) {
+    updateData();
+  }
 }
 </script>
 <template>

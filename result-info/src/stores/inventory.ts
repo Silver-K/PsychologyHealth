@@ -1,10 +1,9 @@
+import axios from '~/request/axios';
 import { cloneDeep } from 'lodash-es';
-import { getLocalStore, setLocalStore } from "~/env/storage";
-import { getKeys, getUniqueId } from "~/helpers/utils";
+import { getUniqueId } from "~/helpers/utils";
 import type { InventoryInfoT } from "~/types/inventory";
 import type { Prettier } from "~/types/tools";
 
-const STORE_KEY = 'whsg/inventories';
 const inventoryInfoRoot: InventoryInfoT = {
   id: '',
   name: '',
@@ -21,68 +20,54 @@ export function genEmptyInventoryInfo() {
 }
 
 type InventoryFormInfo = Omit<InventoryInfoT, 'id'>;
-export function addInventoryInfo(info: InventoryFormInfo) {
+export async function addInventoryInfo(info: InventoryFormInfo) {
   const emptyInfo = genEmptyInventoryInfo();
   const newInfo = Object.assign(emptyInfo, info);
-  const data = getLocalStore<InventoryInfoT[]>(STORE_KEY);
-  let newData: InventoryInfoT[] = [];
-  if (data) {
-    newData = data.concat(newInfo);
-  } else {
-    newData = [newInfo];
+  const resp = await axios('/api/data/new-inventory', {
+    method: 'POST',
+    data: newInfo,
+  });
+  if (resp && resp.status === 200 && resp.data && resp.data.success) {
+    return 0;
   }
-  const result = setLocalStore(STORE_KEY, newData);
-  return result;
+  
+  return 1;
 }
 
-export function setInventoryInfo(info: InventoryInfoT[]) {
-  const result = setLocalStore(STORE_KEY, info);
-  return result;
+export async function modifyInventoryInfo(id: string, data: Partial<InventoryFormInfo>) {
+  const resp = await axios(`/api/data/edit-inventory?id=${id}`, {
+    method: 'POST',
+    data,
+  });
+  if (resp && resp.status === 200 && resp.data && resp.data.success) {
+    return 0;
+  }
+
+  return 1;
 }
 
 type InventoryInfoFilter = Pick<InventoryInfoT, 'classification' | 'name' | 'applicableAge'>;
-export function getInventoryInfo(searchVal?: string, filter?: Prettier<InventoryInfoFilter>) {
-  const data = getLocalStore<InventoryInfoT[]>(STORE_KEY);
-  if (!filter && !searchVal) {
-    return data ? data : [];
-  }
-  if (data) {
-    let filterdData = data;
-    if (searchVal) {
-      filterdData = filterdData.filter((item) => {
-        return getKeys(item).some((key) => typeof item[key] === 'string' && item[key] ? item[key].includes(searchVal) || searchVal.includes(item[key]) : false);
-      });
+export async function getInventoryInfo(searchVal?: string, filter?: Prettier<InventoryInfoFilter>) {
+  const resp = await axios('/api/data/get-inventory', {
+    method: 'POST',
+    data: {
+      searchVal,
+      ...filter,
     }
-    if (filter) {
-      const keys = getKeys(filter);
-      keys.forEach((key) => {
-        const v = filter[key];
-        if (!v) {
-          return;
-        }
-        filterdData = filterdData.filter((item) => {
-          if (typeof item[key] === 'string') {
-            return item[key].includes(String(v));
-          }
-          if (typeof item[key] === 'number') {
-            return item[key] === Number(v);
-          }
-          if (typeof item[key] === 'boolean') {
-            return item[key] === Boolean(v);
-          }
-        })
-      });
-    }    
-    return filterdData
+  });
+  if (resp && resp.status === 200 && resp.data && resp.data.success) {
+    return resp.data.data;
   } else {
     return [];
   }
 }
 
-export function removeInventoryItem(id: string) {
-  const data = getLocalStore<InventoryInfoT[]>(STORE_KEY);
-  if (data) {
-    const newData = data.filter((item) => item.id !== id);
-    setLocalStore(STORE_KEY, newData);
+export async function removeInventoryItem(id: string) {
+  const resp = await axios(`/api/data/remove-inventory?id=${id}`, {
+    method: 'POST',
+  });
+  if (resp && resp.status === 200 && resp.data && resp.data.success) {
+    return 0;
   }
+  return 1;
 }

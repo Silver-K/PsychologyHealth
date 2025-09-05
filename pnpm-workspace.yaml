@@ -2,3 +2,4 @@ packages:
    - 'result-info'
    - 'build'
    - 'server'
+   - 'shared'

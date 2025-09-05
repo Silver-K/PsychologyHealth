@@ -80,3 +80,22 @@ export function group<T extends object, R extends keyof T>(arr: T[], key: R) {
     return acc;
   }, Object.create(null));
 }
+
+/**
+ * 把数字用逗号三位一间隔
+ * @param number 例如 1234567 -> 1,234,567
+ * @returns string
+ */
+export function prettierNumber(number: number) {
+  const str = String(number);
+  const result: string[] = [];
+  const len = str.length;
+  for (let i = 0; i <= Math.floor(len / 3); i++) {
+    const left = len - (i + 1) * 3 < 0 ? 0 : len - (i + 1) * 3;
+    const slice = str.slice(left, len - i * 3);
+    if (slice) {
+      result.push(slice);
+    }
+  }
+  return result.reverse().join(',');
+}

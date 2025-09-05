@@ -1,0 +1,42 @@
+:root {
+  --wh-white: 255,255,255;
+  --wh-black: 0,0,0;
+  --wh-brand: 235,55,55;
+  --wh-primary: 0,135,235;
+  --wh-primary-secondary: 37,99,235;
+  --wh-primary-third: 30,58,138;
+  --wh-primary-fourth: 30, 64, 175;
+  --wh-success: 13,205,13;
+  --wh-success-secondary: 33,155,33;
+  --wh-default: 100,116,139;
+  --wh-bg: 248,250,252;
+  --wh-bg-light: 255,255,255;
+  --wh-bg-primary: 219,234,254;
+  --wh-bg-primary-secondary: 147,197,253;
+  --wh-bd: 203,213,225;
+
+
+  --wh-color-white: rgb(var(--wh-white));
+  --wh-color-black: rgb(var(--wh-black));
+  --wh-color-brand: rgb(var(--wh-brand));
+  --wh-color-primary: rgb(var(--wh-primary));
+  --wh-color-primary-secondary: rgb(var(--wh-primary-secondary));
+  --wh-color-primary-third: rgb(var(--wh-primary-third));
+  --wh-color-primary-fourth: rgb(var(--wh-primary-fourth));
+  --wh-color-text: rgba(var(--wh-black), 0.8);
+  --wh-color-text-inverse: rgba(var(--wh-white), 1);
+  --wh-color-text-hover: rgba(var(--wh-black), 0.6);
+  --wh-color-text-primary-hover: rgba(var(--wh-primary), 0.6);
+  --wh-color-text-primary: rgba(var(--wh-primary-secondary), 1);
+  --wh-color-tip: rgba(var(--wh-black), 0.5);
+  --wh-color-text-disabled: rgba(var(--wh-black), 0.2);
+  --wh-color-text-default: rgba(var(--wh-default), 1);
+
+  --wh-color-success: rgba(var(--wh-success), 1);
+  --wh-color-success-secondary: rgba(var(--wh-success-secondary), 1);
+  --wh-color-bg: rgba(var(--wh-bg), 0.9);
+  --wh-color-bg-light: rgba(var(--wh-bg-light), 1);
+  --wh-color-bg-primary: rgba(var(--wh-bg-primary));
+  --wh-color-bg-primary-secondary: rgba(var(--wh-bg-primary-secondary), 0.3);
+  --wh-color-bd: rgba(var(--wh-bd), 0.3);
+}

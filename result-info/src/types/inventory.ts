@@ -1,4 +1,4 @@
-import type { FileInfoT } from "./file";
+import type { FileInfoT } from "shared";
 
 export interface InventoryInfoT {
   id: string;

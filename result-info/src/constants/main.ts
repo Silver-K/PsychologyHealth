@@ -1,1 +1,1 @@
-export const SYSTEM_NAME = '武侯区儿童心理健康档案管理系统';
+export const SYSTEM_NAME = '武侯区未成年人心理健康档案管理系统';

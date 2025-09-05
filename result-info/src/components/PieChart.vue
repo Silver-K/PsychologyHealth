@@ -24,6 +24,7 @@ interface PieChartPropT {
     }
   >;
   pieName: string;
+  color?: string[];
 }
 const props = defineProps<PieChartPropT>();
 let myChart: echarts.ECharts;
@@ -38,6 +39,7 @@ watch(echartRef, (payload) => {
         orient: 'vertical',
         left: 'left',
       },
+      color: props.color || void 0,
       series: [
         {
           name: props.pieName,
@@ -92,12 +94,16 @@ watch(() => props.dataMap, (newData) => {
 });
 const containerRef = ref();
 let resizeOb: ResizeObserver | undefined;
+let timeout = 0;
 watch(containerRef, (container) => {
   if (container) {
     resizeOb = new ResizeObserver(() => {
-      if (myChart) {
-        myChart.resize();
-      }
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (myChart) {
+          myChart.resize();
+        }
+      }, 300);
     });
     resizeOb.observe(container);
   } else {
@@ -121,14 +127,23 @@ watch(containerRef, (container) => {
   width: 100%;
   padding: 24px;
   padding-top: 16px;
-  border-radius: 8px;
-  overflow: hidden;
 }
 .backgound {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-color: var(--wh-color-bg);
+  background-color: var(--wh-color-bg-light);
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  transition: all .3s ease;
+  border: 1px solid var(--wh-color-bd);
+  border-radius: 8px;
+}
+.container {
+  &:hover {
+    .backgound {
+      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+  }
 }
 .payload {
   position: relative;

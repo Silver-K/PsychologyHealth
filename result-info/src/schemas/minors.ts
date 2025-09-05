@@ -1,11 +1,21 @@
+import type { MinorInfoT } from "shared";
 import type { Prettier } from "~/types/tools";
 
 export const MinorsLabels = {
+  guardianName: '监护人姓名',
+  guardianBirthday: '监护人出生年月',
+  guardianAge: '监护人年龄',
+  guardianGender: '监护人性别',
+  guardianContact: '监护人联系方式',
+  relationship: '监护人与儿童关系',
+  serveCount: '服务次数统计',
+  registratedWuhou: '是否武侯户籍',
   name: '姓名',
   street: '街道',
   community: '社区',
   warningStatus: '预警状态',
   age: '年龄',
+  birthday: '出生年月',
   gender: '性别',
   school: '就读学校',
   grade: '年级',
@@ -15,7 +25,7 @@ export const MinorsLabels = {
   psyTest: '心理测试结果',
   psyCounsel: '心理咨询服务记录',
   lifeEvent: '重大生活事件',
-  focus: '重点关注内容',
+  focus: '重点关注的领域',
   familyGuard: '家庭监护能力',
   otherServer: '其他服务记录',
 } as const;
@@ -31,7 +41,7 @@ export const minorsTableKey = [
 
 export interface MinorItemT {
   key: keyof typeof MinorsLabels;
-  editor: 'input' | 'radio' | 'textarea' | 'textareas' | 'file' | 'complex';
+  editor: 'input' | 'select' | 'date' | 'radio' | 'textarea' | 'textareas' | 'file' | 'complex';
 }
 export const minorsEditorItems: Prettier<MinorItemT>[] = [
   {
@@ -39,16 +49,24 @@ export const minorsEditorItems: Prettier<MinorItemT>[] = [
     editor: 'input',
   },
   {
+    key: 'registratedWuhou',
+    editor: 'radio',
+  },
+  {
     key: 'street',
-    editor: 'input',
+    editor: 'select',
   },
   {
     key: 'community',
-    editor: 'input',
+    editor: 'select',
   },
   {
     key: 'warningStatus',
     editor: 'radio',
+  },
+  {
+    key: 'birthday',
+    editor: 'date',
   },
   {
     key: 'age',
@@ -57,6 +75,30 @@ export const minorsEditorItems: Prettier<MinorItemT>[] = [
   {
     key: 'gender',
     editor: 'radio',
+  },
+  {
+    key: 'guardianName',
+    editor: 'input',
+  },
+  {
+    key: 'guardianBirthday',
+    editor: 'date',
+  },
+  {
+    key: 'guardianAge',
+    editor: 'input',
+  },
+  {
+    key: 'guardianGender',
+    editor: 'radio',
+  },
+  {
+    key: 'guardianContact',
+    editor: 'input',
+  },
+  {
+    key: 'relationship',
+    editor: 'input',
   },
   {
     key: 'school',
@@ -97,18 +139,20 @@ export const minorsEditorItems: Prettier<MinorItemT>[] = [
   {
     key: 'otherServer',
     editor: 'file',
+  },
+  {
+    key: 'serveCount',
+    editor: 'textarea'
   }
 ];
-export const radioLookupMap = {
-  'warningStatus': ['低', '中', '高'],
-  'gender': ['男', '女', '未知'],
-}
+
 export const minorsInfoKey = [
   'name',
   'street',
   'community',
   'warningStatus',
   'age',
+  'birthday',
   'gender',
   'school',
   'grade',
@@ -133,3 +177,16 @@ export const PsyTestLabels = {
   insomnia: '失眠',
   other: '其他',
 } as const;
+
+export function transformFileServe(minorInfo: MinorInfoT) {
+  const input = { ...minorInfo };
+  for (const key of ['psyCounsel', 'familyGuard', 'otherServer'] as const) {
+    if (Array.isArray(input[key])) {
+      input[key] = input[key].map((item) => ({
+        filename: item.filename,
+        name: item.name,
+      }))
+    }
+  }
+  return input;
+}

@@ -9,12 +9,14 @@ const envPath = path.resolve(__dirname, './.env');
 dotenv.config({ path: envPath });
 
 const fileRoutes = require('./routes/fileRoutes');
+const commons = require('./routes/common');
+const datas = require('./routes/data');
+const auths = require('./routes/auth');
 const { errorHandler } = require('./utils/errorHandler');
 const app = express();
 const PORT = process.env.PORT || 443; // HTTPS默认端口
 
 const getStaticIndexHtml = (req, res) => {
-  console.log(req.path);
   const indexPath = path.join(__dirname, 'static', 'index.html');
   
   // 检查文件是否存在
@@ -33,7 +35,10 @@ app.use(express.static(path.join(__dirname, '/static/')));
 app.use(cors());
 
 app.use(express.json());
+app.use('/api/common', commons);
+app.use('/api/data', datas);
 app.use('/api/files', fileRoutes);
+app.use('/api/auth', auths);
 
 // 通配符路由 - 所有未匹配的GET请求返回index.html
 app.get(/^((?!\.(js|css|png|jpg|jpeg|gif|ico|svg|json|woff|woff2|ttf|eot|map)$).)*$/, getStaticIndexHtml);

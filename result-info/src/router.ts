@@ -4,12 +4,16 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('~/pages/home.vue'),
-    redirect: '/list',
+    redirect: '/statics',
     children: [],
   },
   {
     path: '/auth',
     component: () => import('~/pages/authorization.vue'),
+  },
+  {
+    path: '/icons',
+    component: () => import('~/pages/icons.vue'),
   },
   {
     path: '/home',

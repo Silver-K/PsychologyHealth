@@ -1,0 +1,362 @@
+[
+  {
+    "id": "NX",
+    "name": "楠欣社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "BH",
+    "name": "百花社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "SL",
+    "name": "少陵社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "GFQ",
+    "name": "广福桥社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "SN",
+    "name": "双楠社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "QDY",
+    "name": "七道堰社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "JL",
+    "name": "锦里社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "XMQ",
+    "name": "洗面桥社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "SH",
+    "name": "蜀汉社区",
+    "street": "JXJ"
+  },
+  {
+    "id": "GJQ",
+    "name": "郭家桥社区",
+    "street": "WJL"
+  },
+  {
+    "id": "ZD",
+    "name": "棕东社区",
+    "street": "WJL"
+  },
+  {
+    "id": "GHL",
+    "name": "共和路社区",
+    "street": "WJL"
+  },
+  {
+    "id": "LML",
+    "name": "老马路社区",
+    "street": "WJL"
+  },
+  {
+    "id": "XSL",
+    "name": "新生路社区",
+    "street": "WJL"
+  },
+  {
+    "id": "DS",
+    "name": "得胜社区",
+    "street": "HN"
+  },
+  {
+    "id": "GPQ",
+    "name": "高攀桥社区",
+    "street": "HN"
+  },
+  {
+    "id": "JGXC",
+    "name": "锦官新城社区",
+    "street": "HN"
+  },
+  {
+    "id": "NZ",
+    "name": "南站社区",
+    "street": "HN"
+  },
+  {
+    "id": "TZL",
+    "name": "桐梓林社区",
+    "street": "HN"
+  },
+  {
+    "id": "CSY",
+    "name": "长寿苑社区",
+    "street": "HN"
+  },
+  {
+    "id": "NJQ",
+    "name": "倪家桥社区",
+    "street": "YL"
+  },
+  {
+    "id": "HMJ",
+    "name": "黉门街社区",
+    "street": "YL"
+  },
+  {
+    "id": "YLB",
+    "name": "玉林北路社区",
+    "street": "YL"
+  },
+  {
+    "id": "YLD",
+    "name": "玉林东路社区",
+    "street": "YL"
+  },
+  {
+    "id": "DX",
+    "name": "电信路社区",
+    "street": "YL"
+  },
+  {
+    "id": "JRC",
+    "name": "九如村社区",
+    "street": "YL"
+  },
+  {
+    "id": "ZN",
+    "name": "棕南社区",
+    "street": "YL"
+  },
+  {
+    "id": "ZB",
+    "name": "棕北社区",
+    "street": "YL"
+  },
+  {
+    "id": "TST",
+    "name": "跳伞塔社区",
+    "street": "YL"
+  },
+  {
+    "id": "NHC",
+    "name": "南虹村社区",
+    "street": "YL"
+  },
+  {
+    "id": "XNL",
+    "name": "新南路社区",
+    "street": "YL"
+  },
+  {
+    "id": "CC",
+    "name": "长城社区",
+    "street": "HPL"
+  },
+  {
+    "id": "TP",
+    "name": "太平社区",
+    "street": "HPL"
+  },
+  {
+    "id": "ZY",
+    "name": "竹园社区",
+    "street": "HPL"
+  },
+  {
+    "id": "SF",
+    "name": "双丰社区",
+    "street": "HPL"
+  },
+  {
+    "id": "LT",
+    "name": "龙腾社区",
+    "street": "HPL"
+  },
+  {
+    "id": "LZ",
+    "name": "龙爪社区",
+    "street": "HPL"
+  },
+  {
+    "id": "LD",
+    "name": "丽都社区",
+    "street": "HPL"
+  },
+  {
+    "id": "JF",
+    "name": "吉福社区",
+    "street": "JY"
+  },
+  {
+    "id": "JYS",
+    "name": "金雁社区",
+    "street": "JY"
+  },
+  {
+    "id": "JJ",
+    "name": "晋吉社区",
+    "street": "JY"
+  },
+  {
+    "id": "JIY",
+    "name": "晋阳社区",
+    "street": "JY"
+  },
+  {
+    "id": "SY",
+    "name": "沙堰社区",
+    "street": "JY"
+  },
+  {
+    "id": "CY",
+    "name": "潮音社区",
+    "street": "JTQ"
+  },
+  {
+    "id": "BF",
+    "name": "白佛社区",
+    "street": "JTQ"
+  },
+  {
+    "id": "BBJ",
+    "name": "半边街社区",
+    "street": "JTQ"
+  },
+  {
+    "id": "JT",
+    "name": "机投社区",
+    "street": "JTQ"
+  },
+  {
+    "id": "GY",
+    "name": "果堰社区",
+    "street": "JTQ"
+  },
+  {
+    "id": "WSQ",
+    "name": "万寿桥社区",
+    "street": "JTQ"
+  },
+  {
+    "id": "NQ",
+    "name": "南桥社区",
+    "street": "HX"
+  },
+  {
+    "id": "SAH",
+    "name": "三河社区",
+    "street": "HX"
+  },
+  {
+    "id": "SJQ",
+    "name": "沈家桥社区",
+    "street": "HX"
+  },
+  {
+    "id": "XC",
+    "name": "新城社区",
+    "street": "CQ"
+  },
+  {
+    "id": "JC",
+    "name": "锦城社区",
+    "street": "CQ"
+  },
+  {
+    "id": "QL",
+    "name": "七里社区",
+    "street": "CQ"
+  },
+  {
+    "id": "SFS",
+    "name": "双凤社区",
+    "street": "CQ"
+  },
+  {
+    "id": "LJ",
+    "name": "龙井社区",
+    "street": "CQ"
+  },
+  {
+    "id": "MJH",
+    "name": "马家河社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "LIJ",
+    "name": "凉井社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "LB",
+    "name": "陆坝社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "YK",
+    "name": "永康社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "JH",
+    "name": "金花社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "WC",
+    "name": "文昌社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "JAH",
+    "name": "江安河社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "HLM",
+    "name": "花龙门社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "FRY",
+    "name": "芙蓉园社区",
+    "street": "JHQ"
+  },
+  {
+    "id": "TJ",
+    "name": "团结社区",
+    "street": "CJ"
+  },
+  {
+    "id": "SHH",
+    "name": "顺和社区",
+    "street": "CJ"
+  },
+  {
+    "id": "GB",
+    "name": "高碑社区",
+    "street": "CJ"
+  },
+  {
+    "id": "TF",
+    "name": "铁佛社区",
+    "street": "CJ"
+  },
+  {
+    "id": "SJ",
+    "name": "顺江社区",
+    "street": "CJ"
+  },
+  {
+    "id": "YX",
+    "name": "永兴社区",
+    "street": "CJ"
+  }
+]

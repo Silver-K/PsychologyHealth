@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
-import axios from 'axios';
+import axios from '~/request/axios';
 import type { UploadRequestOptions, UploadUserFile } from "element-plus";
 import { ElIcon, ElMessage } from 'element-plus';
 import { downloadFile, getType, getUniqueId } from '~/helpers/utils';

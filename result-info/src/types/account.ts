@@ -1,4 +1,8 @@
 export interface UserAccount {
-  username: string;
   password: string;
+}
+
+export interface ResetAccount {
+  newPassword: string;
+  oldPassword: string;
 }

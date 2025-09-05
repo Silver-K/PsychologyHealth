@@ -1,12 +1,16 @@
 <script lang="tsx" setup>
 import { ref, watch, computed } from 'vue';
-import { ElButton, ElInput, ElRadioGroup, ElRadio } from 'element-plus';
-import { minorsEditorItems, MinorsLabels, radioLookupMap, type MinorItemT } from '~/schemas/minors';
+import { ElButton, ElInput, ElRadioGroup, ElRadio, ElDatePicker, ElSelect, ElOption } from 'element-plus';
+import { minorsEditorItems, MinorsLabels, type MinorItemT } from '~/schemas/minors';
 import { genEmptyMinorInfo } from '~/stores/minors';
+import { useStreetCommunity } from '~/stores/street';
+import type { CommunityInfo } from "~/types/street";
 import MultipleTextarea from '~comp/MultipleTextarea.vue';
 import MultiFileInput from '~comp/MultiFileInput.vue';
-import type { MinorInfoT } from '~/types/minors';
+import { isCommunityKey, isGender, isRegistratedWuhou, isStreetKey, isTempProtectKey, isWarningStatus } from '~/types/minors';
+import { radioLookupMap, type MinorInfoT} from 'shared';
 import { cloneDeep } from 'lodash-es';
+import type { Prettier } from '~/types/tools';
 
 interface PropT {
   inputMode?: boolean;
@@ -21,6 +25,7 @@ interface EmitsT {
   (evt: 'submit', value: MinorInfoT | undefined): void;
   (evt: 'view-psy-test'): void;
   (evt: 'update:form', value: MinorInfoT): void;
+  (evt: 'download'): void;
 }
 const emits = defineEmits<EmitsT>();
 watch(form, (f) => {
@@ -35,7 +40,7 @@ watch(isInputMode, (inInputMode) => {
   }
 });
 const inputModeItems = computed(() => {
-  return isInputMode.value ? minorsEditorItems.filter((i) => i.editor !== 'complex') : minorsEditorItems.slice();
+  return isInputMode.value ? minorsEditorItems.filter((i) => i.editor !== 'complex' && i.key !== 'age' && i.key !== 'guardianAge') : minorsEditorItems.slice();
 });
 
 type FormKey = keyof typeof form['value']
@@ -57,28 +62,70 @@ function leaveInputMode() {
   isInputMode.value = false;
 }
 
-function isTempProtectKey(key: keyof MinorInfoT): key is 'tempProtect' {
-  return key === 'tempProtect';
-}
+const { StreetMap, CommunityMap, getNameByCommunityId, getNameByStreetId, streets } = useStreetCommunity();
+
 const transformShowText = <T extends keyof MinorInfoT>(key: T) => {
   if (isTempProtectKey(key)) {
     const value = form.value[key];
     return value ? '是' : '否';
+  } else if (isStreetKey(key)) {
+    return getNameByStreetId(form.value[key]);
+  } else if (isCommunityKey(key)) {
+    return getNameByCommunityId(form.value[key]);
+  } else if (isWarningStatus(key)) {
+    return radioLookupMap.warningStatus[form.value[key]];
+  } else if (isRegistratedWuhou(key)) {
+    return radioLookupMap.registratedWuhou[form.value[key]];
+  } else if (isGender(key)) {
+    return radioLookupMap.gender[form.value[key]];
   } else {
     return form.value[key];
   }
 }
-// 'input' | 'radio' | 'textarea' | 'textareas' | 'file' | 'complex'
+const communityOptions = computed(() => {
+  if (form.value.street && StreetMap[form.value.street]) {
+    return StreetMap[form.value.street].communities.map((id) => CommunityMap[id])
+  } else {
+    return [] as CommunityInfo[];
+  }
+});
+const streetOptions = computed(() => streets);
+
+const getOptions = (key: FormKey) => {
+  if (key === 'street') {
+    return streetOptions.value;
+  } else {
+    return communityOptions.value;
+  }
+}
+const onDisable = (date: Date) => {
+  return date.getTime() > Date.now();
+}
+
+// 'input' | 'select' | 'date' | 'radio' | 'textarea' | 'textareas' | 'file' | 'complex'
 const componentsMap = {
   input: (key: FormKey) => {
     return (<ElInput v-model={form.value[key]} />);
+  },
+  date: (key: FormKey) => {
+    return (<ElDatePicker v-model={form.value[key]} disabledDate={onDisable} />)
+  },
+  select: (key: FormKey) => {
+    return (<ElSelect v-model={form.value[key]}>
+      {
+        getOptions(key).map((re) => (
+          <ElOption key={re.id} value={re.id} label={re.name}>
+          </ElOption>
+        ))
+      }
+    </ElSelect>)
   },
   radio: (key: FormKey) => {
     return (
       <ElRadioGroup v-model={form.value[key]}>
         {
-          radioLookupMap[key as keyof typeof radioLookupMap].map((label) => (
-            <ElRadio value={label}>{ label }</ElRadio>
+          radioLookupMap[key as keyof typeof radioLookupMap].map((label, index) => (
+            <ElRadio value={index} label={label}></ElRadio>
           ))
         }
       </ElRadioGroup>
@@ -101,6 +148,12 @@ const infoCompMap = {
   input: (key: FormKey) => {
     return (<span>{form.value[key]}</span>);
   },
+  select: (key: FormKey) => {
+    return (<span>{transformShowText(key)}</span>)
+  },
+  date: (key: FormKey) => {
+    return (<span>{form.value[key]}</span>)
+  },
   radio: (key: FormKey) => {
     return (
       <span>{transformShowText(key)}</span>
@@ -119,15 +172,18 @@ const infoCompMap = {
     return (<ElButton onClick={viewPsyTest}>查看详情</ElButton>);
   },
 }
-const FormInputRender = ({ 'minor-item': minorItem }: { 'minor-item': MinorItemT}) => {
-  const { key, editor } = minorItem;
+const FormInputRender = ({ 'minor-item': minorItem }: { 'minor-item'?: Prettier<MinorItemT>, minorItem?: Prettier<MinorItemT> }) => {
+  const { key, editor } = minorItem || {};
 
-  return componentsMap[editor](key);
+  return (key && editor) ? componentsMap[editor](key) : null;
 }
-const InfoRender = ({ 'minor-item': minorItem }: { 'minor-item': MinorItemT}) => {
-  const { key, editor } = minorItem;
+const InfoRender = ({ 'minor-item': minorItem }: { 'minor-item'?: Prettier<MinorItemT>, minorItem?: Prettier<MinorItemT> }) => {
+  const { key, editor } = minorItem || {};
 
-  return infoCompMap[editor](key);
+  return (key && editor) ? infoCompMap[editor](key) : null;
+}
+const downloadDetail = () => {
+  emits('download');
 }
 </script>
 <template>
@@ -137,6 +193,7 @@ const InfoRender = ({ 'minor-item': minorItem }: { 'minor-item': MinorItemT}) =>
       <ElButton v-else @click="enterInputMode" type="primary" class="btn">编辑</ElButton>
       <ElButton v-if="isInputMode" type="warning" @click="reset" class="btn">重置</ElButton>
       <ElButton v-if="isInputMode" type="primary" @click="submit" class="btn">保存</ElButton>
+      <ElButton v-if="!isInputMode" @click="downloadDetail" class="btn">下载</ElButton>
     </div>
   </div>
   <div class="minor-input">
@@ -168,9 +225,7 @@ const InfoRender = ({ 'minor-item': minorItem }: { 'minor-item': MinorItemT}) =>
   align-items: center;
   justify-content: center;
   padding: 8px;
-  box-shadow: inset 0px -1px 4px 1px rgba(var(--wh-black), 0.2);
   border-radius: 4px;
-  background-color: rgba(var(--wh-white), 0.65);
   backdrop-filter: blur(4px);
 }
 .operators + .content {

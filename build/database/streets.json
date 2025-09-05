@@ -1,0 +1,65 @@
+[
+  {
+    "id": "JXJ",
+    "name": "浆洗街街道",
+    "communities": ["NX", "BH", "SL", "GFQ", "SN", "QDY", "JL", "XMQ", "SH"]
+  },
+  {
+    "id": "WJL",
+    "name": "望江路街道",
+    "communities": ["GJQ", "ZD", "GHL", "LML", "XSL"]
+  },
+  {
+    "id": "HN",
+    "name": "火南街道",
+    "communities": ["DS", "GPQ", "JGXC", "NZ", "TZL", "CSY"]
+  },
+  {
+    "id": "YL",
+    "name": "玉林街道",
+    "communities": [
+      "NJQ",
+      "HMJ",
+      "YLB",
+      "YLD",
+      "DX",
+      "JRC",
+      "ZN",
+      "ZB",
+      "TST",
+      "NHC",
+      "XNL"
+    ]
+  },
+  {
+    "id": "HPL",
+    "name": "红牌楼街道",
+    "communities": ["CC", "TP", "ZY", "SF", "LT", "LZ", "LD"]
+  },
+  {
+    "id": "JY",
+    "name": "晋阳街道",
+    "communities": ["JF", "JYS", "JJ", "JIY", "SY"]
+  },
+  {
+    "id": "JTQ",
+    "name": "机投桥街道",
+    "communities": ["CY", "BF", "BBJ", "JT", "GY", "WSQ"]
+  },
+  { "id": "HX", "name": "华兴街道", "communities": ["NQ", "SAH", "SJQ"] },
+  {
+    "id": "CQ",
+    "name": "簇桥街道",
+    "communities": ["XC", "JC", "QL", "SFS", "LJ"]
+  },
+  {
+    "id": "JHQ",
+    "name": "金花桥街道",
+    "communities": ["MJH", "LIJ", "LB", "YK", "JH", "WC", "JAH", "HLM", "FRY"]
+  },
+  {
+    "id": "CJ",
+    "name": "簇锦街道",
+    "communities": ["TJ", "SHH", "GB", "TF", "SJ", "YX"]
+  }
+]

@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ElMessage, type FormInstance } from 'element-plus';
 import { computed, ref, watch } from 'vue';
+import { getFocusArea } from '~/stores/area';
+import type { AreaItemT } from '~/types/area';
 
 interface PropT {
   inputMode: boolean;
@@ -41,6 +43,11 @@ const currentText = computed({
     }
   }
 });
+
+const areaOptions = ref<AreaItemT[]>([]);
+async function updateAreaOptions() {
+  areaOptions.value = await getFocusArea();
+}
 const form = ref({
   key: '',
   text: '',
@@ -49,6 +56,9 @@ const addFormRef = ref<FormInstance>();
 const addDialogOpen = ref(false);
 const openAddDialog = () => {
   addDialogOpen.value = true;
+  if (!areaOptions.value.length) {
+    updateAreaOptions();
+  }
 }
 const closeAddDialog = () => {
   addDialogOpen.value = false;
@@ -121,7 +131,9 @@ const rules = {
     <ElDialog append-to-body v-model="addDialogOpen" title="新增记录" width="500" :close-on-click-modal="false">
       <ElForm ref="addFormRef" :model="form" label-width="auto" :rules="rules">
         <ElFormItem label="ID" prop="key">
-          <ElInput v-model="form.key" placeholder="在这里编辑内容的索引"/>
+          <ElSelect v-model="form.key">
+            <ElOption v-for="item in areaOptions" :key="item.id" :value="item.name" :label="item.name" />
+          </ElSelect>
         </ElFormItem>
         <ElFormItem label="内容" prop="text">
           <ElInput type="textarea" :autosize="{ minRows: 2, maxRows: 6 }" resize="none" placeholder="在这里编辑关注内容" v-model="form.text" />

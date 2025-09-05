@@ -14,7 +14,7 @@ dist-ssr
 *.local
 upload_dir
 *.zip
-
+*.html
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

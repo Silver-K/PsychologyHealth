@@ -1,5 +1,5 @@
-import type { Column } from "element-plus";
-import type { MinorInfoT } from "~/types/minors";
+import type { Column } from 'element-plus';
+import type { MinorInfoT } from 'shared';
 
 export function generateCols<T extends string[]>(config: {
   keys: T,

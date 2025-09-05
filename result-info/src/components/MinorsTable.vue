@@ -1,33 +1,34 @@
 <script lang="tsx" setup>
-import { ref } from 'vue';
-import { minorsTableKey, MinorsLabels } from '~/schemas/minors';
+import { computed, ref } from 'vue';
+import { radioLookupMap, type MinorInfoT } from 'shared';
+import { minorsTableKey, MinorsLabels, transformFileServe } from '~/schemas/minors';
 import { generateCols } from '~/helpers/table';
-import { addMinorInfo, setMinorInfo, genEmptyMinorInfo, getMinorInfo, removeMinorItem } from '~/stores/minors';
+import { addMinorInfo, modifyMinorInfo, genEmptyMinorInfo, getMinorInfo, removeMinorItem } from '~/stores/minors';
 import MinorInput from '~comp/MinorInput.vue';
-import type { MinorInfoT } from '~/types/minors';
+import { isStreetOrCommunityKey, isWarningStatus } from '~/types/minors';
 import { ElMessage, ElMessageBox, type RowClassNameGetter } from 'element-plus';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { useRouter } from 'vue-router';
 import { throttle } from 'lodash-es';
+import { useStreetCommunity } from '~/stores/street';
 
 const router = useRouter();
-const data = ref(getMinorInfo());
+const data = ref<MinorInfoT[]>([]);
+const { streets, getNameByCommunityId, getNameByStreetId } = useStreetCommunity();
+const streetInited = computed(() => !!streets.length);
+async function updateData() {
+  data.value = await getMinorInfo();
+}
+updateData();
 
 function enter(item: MinorInfoT) {
   router.push(`/detail/${item.id}`);
-}
-function protect(item: MinorInfoT) {
-  const { id } = item;
-  const found = data.value.find((each) => each.id === id);
-  if (found) {
-    found.tempProtect = !found.tempProtect;
-    setMinorInfo(data.value);
-  }
 }
 
 function showProtectText(item: MinorInfoT) {
   return item.tempProtect ? '取消庇护' : '庇护';
 }
+
 const cols = generateCols({
   keys: minorsTableKey.slice(),
   renderer: (key: string) => {
@@ -35,7 +36,16 @@ const cols = generateCols({
       return ({ rowData }: { rowData: MinorInfoT }) => (
         <span>{ rowData.tempProtect ? '是' : '否' }</span>
       )
-    } else {
+    } else if (isStreetOrCommunityKey(key)) {
+      const fun = key === 'street' ? getNameByStreetId : getNameByCommunityId;
+      return ({ rowData }: { rowData: MinorInfoT }) => (
+        <span>{ fun(rowData[key]) }</span>
+      )
+    } else if (isWarningStatus(key)) {
+      return ({ rowData }: { rowData: MinorInfoT }) => (
+        <span>{ radioLookupMap.warningStatus[rowData[key]] }</span>
+      )
+    } else  {
       return void 0
     }
   },
@@ -103,8 +113,9 @@ function saveAdd() {
     ElMessage.success("暂存成功");
   }
 }
-function handleAddMinorInfo() {
-  const result = addMinorInfo(addForm.value);
+async function handleAddMinorInfo() {
+  addForm.value = transformFileServe(addForm.value);
+  const result = await addMinorInfo(addForm.value);
   if (result === 0) {
     ElMessage({
       message: '录入成功',
@@ -118,12 +129,12 @@ function handleAddMinorInfo() {
       type: 'error',
     })
   }
-  data.value = getMinorInfo();
+  data.value = await getMinorInfo();
 }
 
 const searchVal = ref('');
-const updateSearchData = (val: string) => {
-  data.value = getMinorInfo(val);
+const updateSearchData = async (val: string) => {
+  data.value = await getMinorInfo(val);
 }
 const searchData = throttle(updateSearchData);
 const search = () => {
@@ -139,8 +150,18 @@ async function del(item: MinorInfoT) {
       type: 'warning',
   });
   const { id } = item;
-  removeMinorItem(id);
+  await removeMinorItem(id);
   search();
+}
+async function protect(item: MinorInfoT) {
+  const { id } = item;
+  const found = data.value.find((each) => each.id === id);
+  if (found) {
+    await modifyMinorInfo(id, {
+      tempProtect: !found.tempProtect
+    });
+    search();
+  }
 }
 </script>
 
@@ -167,7 +188,7 @@ async function del(item: MinorInfoT) {
 
       <ElButton class="record-btn" type="primary" @click="openAddDialog">录入</ElButton>
     </div>
-    <div class="table">
+    <div v-if="streetInited" class="table">
       <ElAutoResizer>
         <template #default="{ width, height }">
           <ElTableV2
