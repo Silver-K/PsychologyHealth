@@ -152,8 +152,8 @@ function saveAdd() {
 }
 
 const searchVal = ref('');
-const updateSearchData = (val: string) => {
-  data.value = getInventoryInfo(val);
+const updateSearchData = async (val: string) => {
+  data.value = await getInventoryInfo(val);
 }
 const searchData = throttle(updateSearchData);
 const search = () => {
@@ -208,7 +208,7 @@ async function confirmFileOperate() {
 
 <template>
   <div class="inventories-table">
-    <ElDialog v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
+    <ElDialog class="i-dlg" v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
       <div class="dlg-body">
         <ElForm :model="addForm" label-width="auto">
           <ElFormItem v-for="item in inventoryTableKeys" :label="InventoryLabels[item]" :key="item">
@@ -267,6 +267,9 @@ async function confirmFileOperate() {
 </template>
 
 <style lang="scss" scoped>
+:deep(.i-dlg) {
+  max-width: 862px;
+}
 .table {
   height: calc(100 * var(--vh) - 60px);
   margin-top: 16px;
