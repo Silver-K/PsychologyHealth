@@ -34,7 +34,7 @@ exports.getMinorsInfo = async (req, res, next) => {
         let filterdData = result;
         if (searchVal) {
           filterdData = filterdData.filter((item) => {
-            return Object.keys(item).some((key) => {
+            return Object.keys(item).filter(i => i !== 'id').some((key) => {
               const textData = textifyData(item, streetMap, communityMap);
               const value = textData[key];
               return (typeof value === 'string' && value) ? value.includes(searchVal) || searchVal.includes(value) : false
@@ -315,7 +315,7 @@ exports.getInventoryInfo = async (req, res, next) => {
         let filterdData = result;
         if (searchVal) {
           filterdData = filterdData.filter((item) => {
-            return Object.keys(item).some((key) => {
+            return Object.keys(item).filter(i => i !== 'id').some((key) => {
               return (typeof item[key] === 'string' && item[key]) ? item[key].includes(searchVal) || searchVal.includes(item[key]) : false
             });
           });
