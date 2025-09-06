@@ -215,8 +215,8 @@ const downloadDetail = () => {
 <style lang="scss" scoped>
 .operators {
   position: fixed;
-  top: 24px;
-  right: 24px;
+  top: calc(36px + var(--top-height));
+  right: 48px;
   z-index: 1;
 }
 .railway {

@@ -66,7 +66,6 @@ const onDownload = () => {
   background-color: rgba(var(--wh-primary), 0.1);
 }
 .card {
-  transform: translateZ(1px);
   margin: 12px;
   padding: 24px 36px;
   background-color: var(--wh-color-bg);
