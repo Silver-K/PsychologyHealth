@@ -130,7 +130,7 @@ const rules = {
   <div class="multiple-textarea">
     <ElDialog append-to-body v-model="addDialogOpen" title="新增记录" width="500" :close-on-click-modal="false">
       <ElForm ref="addFormRef" :model="form" label-width="auto" :rules="rules">
-        <ElFormItem label="ID" prop="key">
+        <ElFormItem label="领域" prop="key">
           <ElSelect v-model="form.key">
             <ElOption v-for="item in areaOptions" :key="item.id" :value="item.name" :label="item.name" />
           </ElSelect>
