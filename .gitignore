@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 !build/node/node_modules
 dist
+static
 dist-ssr
 *.local
 upload_dir
