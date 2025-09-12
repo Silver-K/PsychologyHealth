@@ -1,1 +1,0 @@
-import{k as s}from"./index-BR5oj7Uf.js";function r(){const t=s();return function(o){if(t.options.history.state&&typeof t.options.history.state.position=="number"&&t.options.history.state.position>0&&t.options.history.state.back){t.back();return}if(o){t.push(o);return}t.push("/")}}export{r as u};
