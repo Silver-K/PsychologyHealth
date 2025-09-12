@@ -7,12 +7,11 @@
     "dev:fronted": "pnpm --filter result-info dev",
     "build:fronted": "pnpm --filter result-info build",
     "build_server:backend": "pnpm build:fronted && pnpm build:static && pnpm start:backend",
-    "start:backend": "cd .\\build && start.bat",
+    "start:backend": "cd build && node server.js",
     "release": "pnpm del && pnpm zip",
     "build:static": "cd build && rmdir /s /q static && cd .. && mkdir .\\build\\static && xcopy .\\result-info\\dist .\\build\\static /s",
-    "start:server": "cd .\\build && start.bat",
     "del": "del system.zip",
-    "zip": "cd build & 7z a -tzip ..\\system.zip . -x!node_modules\\* -x!upload_dir\\* && cd .."
+    "zip": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc"
   },
   "keywords": [],
   "author": "",

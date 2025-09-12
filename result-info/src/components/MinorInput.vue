@@ -215,7 +215,7 @@ const downloadDetail = () => {
 <style lang="scss" scoped>
 .operators {
   position: fixed;
-  top: calc(36px + var(--top-height));
+  top: 64px;
   right: 48px;
   z-index: 1;
 }

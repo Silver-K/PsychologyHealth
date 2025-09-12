@@ -46,7 +46,7 @@ exports.setPassword = async (req, res, next) => {
     const salt = bcrypt.genSaltSync();
     const hash = bcrypt.hashSync(password, salt);
     await isEdit ? edit('auth', 'password', {
-      id: password,
+      id: 'password',
       value: hash
     }) : create('auth', {
       id: 'password', 
@@ -65,7 +65,7 @@ exports.setPassword = async (req, res, next) => {
       return res.status(200).json({
         success: true,
         data: null,
-        message: 'set password successfully',
+        message: 'init password successfully',
       });
     }
     const isOldSame = bcrypt.compareSync(req.body.oldPassword, data.value)
@@ -77,7 +77,7 @@ exports.setPassword = async (req, res, next) => {
       });
     }
     if (req.body.newPassword) {
-      await createNewPassword(req.body.newPassword);
+      await createNewPassword(req.body.newPassword, true);
       return res.status(200).json({
         success: true,
         data: null,

@@ -1,5 +1,5 @@
 <script lang="tsx" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { radioLookupMap, type MinorInfoT } from 'shared';
 import { minorsTableKey, MinorsLabels, transformFileServe } from '~/schemas/minors';
 import { generateCols } from '~/helpers/table';
@@ -11,6 +11,7 @@ import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { useRouter } from 'vue-router';
 import { throttle } from 'lodash-es';
 import { useStreetCommunity } from '~/stores/street';
+import { useLock } from '~/composables/useLock';
 
 const router = useRouter();
 const data = ref<MinorInfoT[]>([]);
@@ -81,8 +82,11 @@ const rowClass = ({ rowData }: Parameters<RowClassNameGetter<MinorInfoT>>[0]) =>
   }
   return ''
 }
-
+const { lock, unLock } = useLock('scroll');
 const addDialogVisible = ref(false);
+watch(addDialogVisible, (visible) => {
+  visible ? lock() : unLock();
+});
 const addForm = ref(genEmptyMinorInfo());
 const STASH = 'whsg/stash/input-minor';
 function openAddDialog() {
@@ -167,7 +171,7 @@ async function protect(item: MinorInfoT) {
 
 <template>
   <div class="minors-table">
-    <ElDialog class="i-dlg" v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
+    <ElDialog class="record-dlg" append-to-body v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
       <div class="dlg-body">
         <MinorInput input-mode v-model:form="addForm" />
       </div>      
@@ -206,9 +210,6 @@ async function protect(item: MinorInfoT) {
 </template>
 
 <style lang="scss" scoped>
-:deep(.i-dlg) {
-  max-width: 862px;
-}
 .table {
   height: calc(100 * var(--vh) - 60px);
   margin-top: 16px;

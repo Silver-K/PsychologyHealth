@@ -33,18 +33,30 @@ watch(echartRef, (payload) => {
     myChart = echarts.init(payload);
     const option: EChartsOption = {
       tooltip: {
-        trigger: 'item'
+        trigger: 'item',
+        formatter: (param: any) => {
+          const { seriesName, data, percent } = param;
+          return `${seriesName}<br>${data.name}: ${data.value} (${percent}%)`
+        }
       },
       legend: {
         orient: 'vertical',
         left: 'left',
+        textStyle: {
+          color: '#fff',
+        }
       },
       color: props.color || void 0,
       series: [
         {
           name: props.pieName,
           type: 'pie',
-          radius: '50%',
+          radius: ['35%', '70%'],
+          itemStyle: {
+            borderRadius: 8,
+            borderColor: 'rgba(15, 15, 35, 0.8)',
+            borderWidth: 6
+          },
           data: props.dataMap.map((e) => {
             return {
               name: e.tag,
@@ -70,23 +82,28 @@ watch(() => props.dataMap, (newData) => {
   myChart.setOption({
     series: [
       {
-          name: props.pieName,
-          type: 'pie',
-          radius: '50%',
-          data: newData.map((e) => {
-            return {
-              name: e.tag,
-              value: e.value,
-            }
-          }),
-          emphasis: {
-            itemStyle: {
-              shadowBlur: 10,
-              shadowOffsetX: 0,
-              shadowColor: 'rgba(0, 0, 0, 0.5)',
-            }
+        name: props.pieName,
+        type: 'pie',
+        radius: ['35%', '70%'],
+        itemStyle: {
+          borderRadius: 8,
+          borderColor: 'rgba(15, 15, 35, 0.8)',
+          borderWidth: 6
+        },
+        data: newData.map((e) => {
+          return {
+            name: e.tag,
+            value: e.value,
+          }
+        }),
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)',
           }
         }
+      }
     ]
   })
 }, {
@@ -115,7 +132,7 @@ watch(containerRef, (container) => {
 
 <template>
   <div ref="containerRef" class="container">
-    <div class="backgound"></div>
+    <div class="backgound cyber-card"></div>
     <div ref="echartRef" class="payload"></div>
   </div>
 </template>
@@ -132,16 +149,13 @@ watch(containerRef, (container) => {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background-color: var(--wh-color-bg-light);
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
-  transition: all .3s ease;
-  border: 1px solid var(--wh-color-bd);
-  border-radius: 8px;
 }
 .container {
   &:hover {
     .backgound {
-      box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(3, 216, 243, 0.4);
+      border-color: rgba(255, 0, 184, 0.5);
     }
   }
 }

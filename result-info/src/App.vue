@@ -15,8 +15,9 @@ if (!window['_resize_']) {
 }
 const router = useRouter();
 
+const nonAuthPages = ['/auth', '/icons', '/demo'];
 router.beforeEach((to) => {
-  if (to.path !== '/auth' && to.path !== '/icons') {
+  if (!nonAuthPages.includes(to.path)) {
     const fail = requestAuth();
     if (fail) {
       ElMessage({
@@ -30,14 +31,25 @@ router.beforeEach((to) => {
     }
   }
 });
-console.log('documentPictureInPicture' in window);
+router.afterEach((to) => {
+  if (to.path !== '/home' && to.query.row_page_key) {
+    router.replace({
+      query: {
+        ...router.currentRoute.value.query,
+        row_page_key: void 0,
+      }
+    })
+  }
+})
 </script>
 
 <template>
   <RouterView>
     <template #default="{ Component }">
       <KeepAlive>
-        <component :is="Component"></component>
+        <Transition name="page-fade">
+          <component :is="Component"></component>
+        </Transition>
       </KeepAlive>
     </template>
   </RouterView>

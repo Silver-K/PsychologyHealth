@@ -67,7 +67,7 @@ const cancel = async () => {
 }
 </script>
 <template>
-  <div class="authorization-page">
+  <div class="authorization-page" :class="{ modify: !isLogin }">
     <div class="login-box" :class="{ modify: !isLogin }">
       <h4 class="title">{{ loginTitle }}</h4>
         <template v-if="isLogin">
@@ -89,7 +89,7 @@ const cancel = async () => {
         </template>
       <div class="btns">
         <template v-if="isLogin">
-          <ElButton size="large" class="login-btn" type="primary" @click.prevent="login">进入系统</ElButton>
+          <ElButton size="large" class="login-btn" plain @click.prevent="login">进入系统</ElButton>
         </template>
         <template v-else>
           <ElButton size="large" class="confirm-btn" type="primary" @click="setPassword">确认修改</ElButton>
@@ -102,7 +102,11 @@ const cancel = async () => {
 
 <style lang="scss" scoped>
 .authorization-page {
-  background-image: linear-gradient(170deg, rgba(160, 218, 208, 0.3) 40%, transparent);
+  background-image: url(~/assets/imgs/kvt.webp);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+
   height: calc(100 * var(--vh));
   display: flex;
   justify-content: center;
@@ -113,8 +117,10 @@ const cancel = async () => {
   width: 520px;
   height: 260px;
   border-radius: 16px;
-  box-shadow: -2px -4px 16px 4px rgba(var(--wh-black), 0.2) inset, 2px 4px 16px 0px rgba(var(--wh-black), 0.2);
-  background-color: var(--wh-color-bg);
+  box-shadow: -2px -4px 16px 4px rgba(var(--wh-black), 0.2) inset, 2px 4px 16px 0px rgba(var(--wh-white), 0.2);
+  background-color: rgba(255,255,255,.2);
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(var(--wh-white), 0.2);
 
   &.modify {
     height: 300px;
@@ -125,7 +131,8 @@ const cancel = async () => {
   font-size: 32px;
   line-height: 48px;
   margin-top: 24px;
-  color: rgba(var(--wh-black), 0.75);
+  color: rgba(var(--wh-white), .8);
+  text-shadow: 0px 2px 16px rgba(0,171,243, .4);
 }
 .form {
   margin-top: 18px;
@@ -142,5 +149,11 @@ const cancel = async () => {
 .login-btn {
   display: flex;
   width: 100%;
+  --el-button-text-color: rgba(var(--wh-black), .8);
+  --el-button-bg-color: rgba(var(--wh-white), 0.75);
+  --el-button-hover-bg-color: rgba(var(--wh-primary), 0.75);
+  --el-button-hover-text-color: rgba(var(--wh-white), 0.95);
+  --el-button-hover-border-color: rgba(var(--wh-white), 0.75);
+  --el-button-active-border-color: rgba(var(--wh-white), 0.75);
 }
 </style>

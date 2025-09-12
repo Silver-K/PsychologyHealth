@@ -30,9 +30,9 @@ export const radioLookupMap = {
 }
 
 export const StaticsLabels = {
+  warningStatus: '预警状态',
   street: '街道',
   community: '社区',
-  warningStatus: '预警状态',
   age: '年龄',
   gender: '性别',
   tempProtect: '临时庇护',
@@ -81,7 +81,6 @@ export function calcAge(data) {
     const v = data[key.replace('age', 'birthday').replace('Age', 'Birthday')];
     if (typeof v === 'string' || v instanceof Date) {
       result[key] = calculateAge(v);
-      console.log(result[key]);
     }
   }
   return result;

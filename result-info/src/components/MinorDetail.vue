@@ -6,6 +6,7 @@ import type { MinorInfoT } from 'shared';
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 import { transformFileServe } from '~/schemas/minors';
+import { useBack } from '~/composables/useBack';
 
 const route = useRoute();
 const router = useRouter();
@@ -50,31 +51,26 @@ const onSubmit = async (info: MinorInfoT | undefined) => {
 const onDownload = () => {
   downloadMinorInfo(String(id));
 }
+const back = useBack();
+const backToHome = () => {
+  back('/home?row_page_key=minors');
+}
 </script>
 <template>
   <div class="minor-detail">
-    <div class="card">
+    <div class="back-btn" @click="backToHome">
+      <span class="icon icon-back icon-bold icon-free"></span>
+      返回
+    </div>
+    <div class="normal-card">
       <MinorInput v-if="detailData" :form="detailData" @view-psy-test="toPsyTest" @submit="onSubmit" @download="onDownload" />
     </div>
   </div>
 </template>
 <style lang="scss" scoped>
 .minor-detail {
-  height: 100%;
-  overflow-y: auto;
+  height: calc(100 * var(--vh));
   padding: 12px;
-  background-color: rgba(var(--wh-primary), 0.1);
-}
-.card {
-  margin: 12px;
-  padding: 24px 36px;
-  background-color: var(--wh-color-bg);
-  border-radius: 8px;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
-  transition: all .3s ease;
-
-  &:hover {
-    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-  }
+  background-color: rgba(15, 15, 35, 0.2);
 }
 </style>

@@ -378,6 +378,39 @@ exports.newInventoryInfo = async (req, res, next) => {
   }
 }
 
+exports.newSomeInventoryInfo = async (req, res, next) => {
+  const { create } = dataControl();
+
+  const data = req.body || { data: [] };
+  if (!data.length) {
+    return res.status(400).json({
+      success: false,
+      message: 'miss params data',
+      data: null,
+    })
+  }
+  const dataArr = [data].flat();
+  const ids = [];
+  try {
+    const pushData = dataArr.map((item) => {
+      const id = nanoid(16);
+      ids.push(id);
+      return {
+        ...item,
+        id
+      }
+    })
+    await create('inventory', pushData);
+  } catch (error) {
+    next(error);
+  }  
+  res.status(200).json({
+    success: true,
+    data: ids,
+    message: 'add new inventory successfully',
+  });  
+}
+
 exports.editInventoryInfo = async (req, res, next) => {
   const { edit, onError } = dataControl();
   const data = { ...req.body || {} };
@@ -527,6 +560,8 @@ const getRecord = (inOrOut) => async (req, res, next) => {
     next(error);
   }
 }
+
+
 
 exports.getRecordIn = getRecord('in');
 exports.getRecordOut = getRecord('out');

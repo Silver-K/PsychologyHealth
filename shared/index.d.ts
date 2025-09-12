@@ -118,9 +118,9 @@ export const radioLookupMap: {
   'registratedWuhou': ['是', '否'],
 };
 export const StaticsLabels: {
+  warningStatus: '预警状态',
   street: '街道',
   community: '社区',
-  warningStatus: '预警状态',
   age: '年龄',
   gender: '性别',
   tempProtect: '临时庇护',

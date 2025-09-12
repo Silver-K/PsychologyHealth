@@ -13,7 +13,7 @@
   --wh-bg-light: 255,255,255;
   --wh-bg-primary: 219,234,254;
   --wh-bg-primary-secondary: 147,197,253;
-  --wh-bd: 203,213,225;
+  --wh-bd: 213,213,255;
 
 
   --wh-color-white: rgb(var(--wh-white));
@@ -38,5 +38,5 @@
   --wh-color-bg-light: rgba(var(--wh-bg-light), 1);
   --wh-color-bg-primary: rgba(var(--wh-bg-primary));
   --wh-color-bg-primary-secondary: rgba(var(--wh-bg-primary-secondary), 0.3);
-  --wh-color-bd: rgba(var(--wh-bd), 0.3);
+  --wh-color-bd: rgba(var(--wh-bd), 0.5);
 }

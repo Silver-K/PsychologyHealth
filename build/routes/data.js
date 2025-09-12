@@ -17,6 +17,7 @@ const {
   getRecordIn,
   getRecordOut,
   getMinorsCategoryCount,
+  newSomeInventoryInfo,
 } = require("../controllers/data");
 
 router.post("/get-minors", getMinorsInfo);
@@ -28,6 +29,7 @@ router.post("/edit-psytest", editPsyTestInfo);
 
 router.post("/get-inventory", getInventoryInfo);
 router.post("/new-inventory", newInventoryInfo);
+router.post("/new-patch-inventory", newSomeInventoryInfo);
 router.post("/edit-inventory", editInventoryInfo);
 router.post("/remove-inventory", removeInventoryInfo);
 

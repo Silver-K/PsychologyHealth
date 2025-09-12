@@ -1,16 +1,19 @@
 <script lang="tsx" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
+import * as XLSX from 'xlsx';
 import MultiFileInput from './MultiFileInput.vue';
 import { inventoryTableKeys, InventoryLabels } from '~/schemas/inventory';
 import { generateCols } from '~/helpers/table';
-import { addInventoryInfo, genEmptyInventoryInfo, getInventoryInfo, removeInventoryItem, modifyInventoryInfo } from '~/stores/inventory';
+import { addInventoryInfo, genEmptyInventoryInfo, getInventoryInfo, removeInventoryItem, modifyInventoryInfo, patchInventoryInfo } from '~/stores/inventory';
 
 import type { InventoryInfoT } from '~/types/inventory';
-import { ElDropdown, ElDropdownItem, ElDropdownMenu, ElMessage, ElMessageBox } from 'element-plus';
+import { ElDropdown, ElDropdownItem, ElDropdownMenu, ElMessage, ElMessageBox, type UploadFile } from 'element-plus';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { downloadFile, getType } from '~/helpers/utils';
 import { throttle } from 'lodash-es';
 import type { FileInfoT } from 'shared';
+import { UploadFilled } from '@element-plus/icons-vue';
+import { useLock } from '~/composables/useLock';
 
 const data = ref();
 async function updateData() {
@@ -151,6 +154,39 @@ function saveAdd() {
   }
 }
 
+const patchDialogVisible = ref(false);
+const patchForm = ref<InventoryInfoT[]>([]);
+function openPatchDialog() {
+  patchDialogVisible.value = true;
+}
+function closePatchDialog() {
+  patchDialogVisible.value = false;
+}
+function resetPatchDialog() {
+  patchForm.value = [];
+}
+function abortPatch() {
+  resetPatchDialog();
+  closePatchDialog();
+}
+
+
+const { lock, unLock } = useLock('scroll');
+watch(addDialogVisible, (visible) => {
+  if (visible) {
+    lock();
+  } else {
+    unLock();
+  }
+});
+watch(patchDialogVisible, (visible) => {
+  if (visible) {
+    lock();
+  } else {
+    unLock();
+  }
+})
+
 const searchVal = ref('');
 const updateSearchData = async (val: string) => {
   data.value = await getInventoryInfo(val);
@@ -168,7 +204,11 @@ async function del(item: InventoryInfoT) {
       cancelButtonText: '取消',
       type: 'warning',
   });
-  removeInventoryItem(item.id);
+  await removeInventoryItem(item.id);
+  ElMessage({
+    message: '删除成功',
+    type: 'success'
+  });
   search();
 }
 async function handleAddInventoryInfo() {
@@ -180,6 +220,23 @@ async function handleAddInventoryInfo() {
     });
     closeAddDialog();
     removeSave();
+  } else {
+    ElMessage({
+      message: '录入失败',
+      type: 'error',
+    })
+  }
+  search();
+}
+async function handlePatchInventoryInfo() {
+  const result = await patchInventoryInfo(patchForm.value);
+  if (result === 0) {
+    ElMessage({
+      message: '录入成功',
+      type: 'success'
+    });
+    closePatchDialog();
+    resetPatchDialog();
   } else {
     ElMessage({
       message: '录入失败',
@@ -204,11 +261,39 @@ async function confirmFileOperate() {
   }
   fileDialogVisible.value = false;
 }
+
+function equalsInventoryKeyLabel(obj: Record<string, string>) {
+  return Object.keys(obj).every((key) => obj[key] === InventoryLabels[key as keyof typeof InventoryLabels]);
+}
+
+async function resolveXlsx(file: UploadFile) {
+  const { raw } = file;
+  if (!raw) {
+    return;
+  }
+  const buffer = await raw.arrayBuffer();
+  const wb = XLSX.read(buffer, { type: 'buffer' });
+  const headers = inventoryTableKeys.slice();
+  const result = wb.SheetNames.map((n) => {
+    const ws = wb.Sheets[n];
+    const json = XLSX.utils.sheet_to_json(ws, {
+      header: headers
+    });
+    return json;
+  }).filter((arr) => arr.length).flat() as Record<typeof headers[number], string>[];
+  patchForm.value = result.filter((obj) => !equalsInventoryKeyLabel(obj)).map((item) => {
+    const form = genEmptyInventoryInfo();
+    return {
+      ...form,
+      ...item,
+    }
+  });  
+}
 </script>
 
 <template>
   <div class="inventories-table">
-    <ElDialog class="i-dlg" v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
+    <ElDialog append-to-body class="record-dlg" v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
       <div class="dlg-body">
         <ElForm :model="addForm" label-width="auto">
           <ElFormItem v-for="item in inventoryTableKeys" :label="InventoryLabels[item]" :key="item">
@@ -224,7 +309,40 @@ async function confirmFileOperate() {
         >
       </template>
     </ElDialog>
-    <ElDialog v-model="fileDialogVisible" :title="fileOperateTitle" :close-on-click-modal="false">
+    <ElDialog append-to-body class="record-dlg" v-model="patchDialogVisible" title="批量录入" :close-on-click-modal="false">
+      <div class="dlg-body">
+        <ElUpload
+          class="patch-upload"
+          drag
+          accept=".xlsx"
+          :on-change="resolveXlsx"
+          :auto-upload="false"
+        >
+          <ElIcon class="el-icon--upload"><UploadFilled /></ElIcon>
+          <div class="el-upload__text">
+            拖拽文件到此处或点击此处选择文件（仅支持xlsx文件）
+          </div>
+        </ElUpload>
+        <div class="record-form" v-for="(form, index) in patchForm" :key="index">
+          <div class="record-form-title">
+            <span>量表</span>
+            <span>{{ index + 1 }}</span>
+          </div>
+          <ElForm class="record-form__inner" label-width="auto">
+            <ElFormItem v-for="item in inventoryTableKeys" :label="InventoryLabels[item]" :key="item">
+              <ElInput v-model="form[item]"/>
+            </ElFormItem>
+          </ElForm>
+        </div>
+      </div>      
+      <template #footer>
+        <ElButton class="opt-btn" @click="abortPatch">放弃</ElButton>
+        <ElButton type="primary" class="opt-btn" @click="handlePatchInventoryInfo"
+          >提交</ElButton
+        >
+      </template>
+    </ElDialog>
+    <ElDialog append-to-body v-model="fileDialogVisible" :title="fileOperateTitle" :close-on-click-modal="false">
       <template v-if="isFileUpload">
         <MultiFileInput v-model:files="uploadFiles" input-mode only-upload />
       </template>
@@ -249,6 +367,7 @@ async function confirmFileOperate() {
       </ElInput>
 
       <ElButton class="record-btn" type="primary" @click="openAddDialog">录入</ElButton>
+      <ElButton class="record-btn" type="success" @click="openPatchDialog">批量录入</ElButton>
     </div>
     <div v-if="data" class="table">
       <ElAutoResizer>
@@ -267,9 +386,6 @@ async function confirmFileOperate() {
 </template>
 
 <style lang="scss" scoped>
-:deep(.i-dlg) {
-  max-width: 862px;
-}
 .table {
   height: calc(100 * var(--vh) - 60px);
   margin-top: 16px;

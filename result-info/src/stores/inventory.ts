@@ -34,6 +34,18 @@ export async function addInventoryInfo(info: InventoryFormInfo) {
   return 1;
 }
 
+export async function patchInventoryInfo(infos: InventoryFormInfo[]) {
+  const resp = await axios('/api/data/new-patch-inventory', {
+    method: 'POST',
+    data: infos,
+  });
+  if (resp && resp.status === 200 && resp.data && resp.data.success) {
+    return 0;
+  }
+  
+  return 1;
+}
+
 export async function modifyInventoryInfo(id: string, data: Partial<InventoryFormInfo>) {
   const resp = await axios(`/api/data/edit-inventory?id=${id}`, {
     method: 'POST',

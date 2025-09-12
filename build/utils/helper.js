@@ -73,7 +73,7 @@ function dataControl() {
   async function create(file, data) {
     const { path: p, success, content } = await exists(file);
     if (success) {
-      content.push(data);
+      Array.isArray(data) ? content.push(...data) : content.push(data);
       await fs.writeFile(p, JSON.stringify(content), 'utf-8');
     }
   }

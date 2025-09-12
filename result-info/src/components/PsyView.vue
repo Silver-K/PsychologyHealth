@@ -4,6 +4,7 @@ import PsyTest from './PsyTest.vue';
 import { getMinorInfo, editPsyTestInfo, addPsyTestInfo } from '~/stores/minors';
 import type { ComposePsyData, MinorInfoT, StaticFile } from 'shared';
 import { ref } from 'vue';
+import { useBack } from '~/composables/useBack';
 
 const route = useRoute();
 const { id } = route.params as { id: string };
@@ -27,16 +28,23 @@ const handleEdit = async (key: keyof ComposePsyData, form: StaticFile) => {
     updateData();
   }
 }
+const back = useBack();
 </script>
 <template>
   <div class="psy-view">
-    <PsyTest v-if="detailData" v-bind="detailData.psyTest" @add="handleAdd" @edit="handleEdit"/>
+    <div class="back-btn" @click="back()">
+      <span class="icon icon-back icon-bold icon-free"></span>
+      返回
+    </div>
+    <div class="normal-card">
+      <PsyTest v-if="detailData" v-bind="detailData.psyTest" @add="handleAdd" @edit="handleEdit"/>
+    </div>
   </div>
 </template>
 <style lang="scss" scoped>
 .psy-view {
   padding: 12px;
-  overflow-y: auto;
-  height: 100%;
+  height: calc(100 * var(--vh));
+  background-color: rgba(15, 15, 35, 0.2);
 }
 </style>
