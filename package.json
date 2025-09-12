@@ -11,7 +11,7 @@
     "release": "pnpm del && pnpm zip",
     "build:static": "cd build && rmdir /s /q static && cd .. && mkdir .\\build\\static && xcopy .\\result-info\\dist .\\build\\static /s",
     "del": "del system.zip",
-    "zip": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc"
+    "zip": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules -xr!build\\database -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc"
   },
   "keywords": [],
   "author": "",

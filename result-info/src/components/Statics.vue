@@ -327,7 +327,7 @@ const particlesOpts = {
   transform: translateX(-50%);
   width: 800px;
   height: var(--h);
-  background-image: url('~/assets/imgs/bg.png');
+  background-image: url('~/assets/imgs/bg.webp');
   background-position: center;
   background-size: 1306px 100%;
   background-repeat: no-repeat;
@@ -344,13 +344,13 @@ const particlesOpts = {
   &::before {
     left: -32px;
     width: calc(488 * var(--ratio));
-    background-image: url('~/assets/imgs/bg_left.png');
+    background-image: url('~/assets/imgs/bg_left.webp');
   }
   &::after {
     top: -1px;
     right: -32px;
     width: calc(465 * var(--ratio));
-    background-image: url('~/assets/imgs/bg_right.png');
+    background-image: url('~/assets/imgs/bg_right.webp');
   }
 }
 .placeholder {
