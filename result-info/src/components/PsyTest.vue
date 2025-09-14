@@ -5,7 +5,7 @@ import LineChart from '~comp/LineChart.vue';
 import MultiFileInput from '~comp/MultiFileInput.vue';
 import { computed, ref, watch } from 'vue';
 import type { FormInstance } from 'element-plus';
-import WhDialog from './WhDialog';
+import WhDialog from './WhDialog.vue';
 import { downloadFile, getType } from '~/helpers/utils';
 
 type ComposeKeys = keyof ComposePsyData;

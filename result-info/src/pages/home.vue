@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import WhDialog from "~/components/WhDialog";
+import WhDialog from "~/components/WhDialog.vue";
 import { disposeAuth } from "~/stores/auth";
 import RowPages from '~comp/RowPages.vue';
 import RowPageItem from '~comp/RowPageItem.vue';
@@ -40,6 +40,7 @@ function reset() {
   systemMenuVisible.value = false;
   router.push('/auth?modify_password=true');
 }
+
 const handleKeyup = (evt: KeyboardEvent) => {
   if (getLocker()) {
     return;
@@ -48,6 +49,7 @@ const handleKeyup = (evt: KeyboardEvent) => {
   if (key === 'Escape' && !ctrlKey && !altKey) {
     systemMenuVisible.value = true;
   }
+
   if (key === '1') {
     rowIndex.value = 0;
   } else if (key === '2') {

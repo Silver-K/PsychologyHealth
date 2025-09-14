@@ -124,10 +124,10 @@ const particlesOpts = {
   fpsLimit: 60,
   particles: {
     number: {
-      value: 80,
+      value: 50,
       density: {
         enable: true,
-        value_area: 800,
+        value_area: 1200,
       },
     },
     color: {
@@ -137,7 +137,7 @@ const particlesOpts = {
       type: "circle",
     },
     opacity: {
-      value: 0.5,
+      value: 0.4,
       random: false,
     },
     size: {
@@ -146,7 +146,7 @@ const particlesOpts = {
     },
     links: {
       enable: true,
-      distance: 150,
+      distance: 120,
       color: "#00C2FF",
       opacity: 0.4,
       width: 1,
@@ -164,11 +164,11 @@ const particlesOpts = {
     detect_on: "canvas",
     events: {
       onhover: {
-        enable: true,
+        enable: false,
         mode: "grab",
       },
       onclick: {
-        enable: true,
+        enable: false,
         mode: "push",
       },
     },
@@ -359,12 +359,12 @@ const particlesOpts = {
 .sys-title {
   position: absolute;
   left: 50%;
-  top: 42px;
+  top: 44px;
   white-space: nowrap;
 
   text-shadow: 0 0 5px rgba(3, 216, 243, 0.8), 0 0 10px rgba(3, 216, 243, 0.6);
   font-size: 36px;
-  line-height: 48px;
+  line-height: 54px;
   color: var(--wh-color-text-inverse);
   transform: translateX(-50%);
 }
@@ -476,7 +476,7 @@ const particlesOpts = {
 .static-area {
   display: grid;
   justify-content: flex-start;
-  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(800px, 1fr));
   column-gap: 24px;
   row-gap: 24px;
 }

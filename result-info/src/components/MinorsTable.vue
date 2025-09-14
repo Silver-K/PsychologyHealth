@@ -7,7 +7,7 @@ import { addMinorInfo, modifyMinorInfo, genEmptyMinorInfo, getMinorInfo, removeM
 import MinorInput from '~comp/MinorInput.vue';
 import { isStreetOrCommunityKey, isWarningStatus } from '~/types/minors';
 import { ElMessage, ElMessageBox, type RowClassNameGetter } from 'element-plus';
-import WhDialog from './WhDialog';
+import WhDialog from './WhDialog.vue';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { useRouter } from 'vue-router';
 import { throttle } from 'lodash-es';

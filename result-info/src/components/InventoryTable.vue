@@ -8,7 +8,7 @@ import { addInventoryInfo, genEmptyInventoryInfo, getInventoryInfo, removeInvent
 
 import type { InventoryInfoT } from '~/types/inventory';
 import { ElDropdown, ElDropdownItem, ElDropdownMenu, ElMessage, ElMessageBox, type UploadFile } from 'element-plus';
-import WhDialog from './WhDialog';
+import WhDialog from './WhDialog.vue';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { downloadFile, getType } from '~/helpers/utils';
 import { throttle } from 'lodash-es';

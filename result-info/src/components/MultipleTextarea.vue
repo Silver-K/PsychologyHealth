@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ElMessage, type FormInstance } from 'element-plus';
-import WhDialog from './WhDialog';
+import WhDialog from './WhDialog.vue';
 import { computed, ref, watch } from 'vue';
 import { getFocusArea } from '~/stores/area';
 import type { AreaItemT } from '~/types/area';
