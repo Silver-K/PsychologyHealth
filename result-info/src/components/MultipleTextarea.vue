@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ElMessage, type FormInstance } from 'element-plus';
+import WhDialog from './WhDialog';
 import { computed, ref, watch } from 'vue';
 import { getFocusArea } from '~/stores/area';
 import type { AreaItemT } from '~/types/area';
@@ -128,7 +129,7 @@ const rules = {
 
 <template>
   <div class="multiple-textarea">
-    <ElDialog append-to-body v-model="addDialogOpen" title="新增记录" width="500" :close-on-click-modal="false">
+    <WhDialog append-to-body v-model="addDialogOpen" title="新增记录" width="500" :close-on-click-modal="false">
       <ElForm ref="addFormRef" :model="form" label-width="auto" :rules="rules">
         <ElFormItem label="领域" prop="key">
           <ElSelect v-model="form.key">
@@ -145,7 +146,7 @@ const rules = {
           <ElButton type="success" @click="confirmAdd">确认添加</ElButton>
         </div>
       </template>
-    </ElDialog>
+    </WhDialog>
     <div class="section">
       <ElSelect v-model="currentSelectKey" placeholder="请选择一条记录...">
         <ElOption v-for="item in modelValue" :key="item.key" :value="item.key">{{ item.key }}</ElOption>

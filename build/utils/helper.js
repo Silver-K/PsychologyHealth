@@ -18,7 +18,7 @@ function prettyMemorySize(size) {
 function dataControl() {
   const fs = require('fs').promises;
   const path = require('path');
-  const basePath = path.resolve('database');
+  const basePath = path.resolve('..', 'database');
   const defaultError = (err) => {
     if (err && err.message) {
       console.log(err.message);
@@ -59,14 +59,13 @@ function dataControl() {
         }
       }      
     } else {
-      callError({
-        type: 'NotFound',
-        code: 404,
-        message: `cannot find ${file}`,
-      });
+      // 创建相应文件
+      await fs.writeFile(f, '[]', 'utf-8');
       return {
-        success: false,
-        content,
+        path: f,
+        content: [],
+        success: true,
+        error: null,
       }
     }
   }

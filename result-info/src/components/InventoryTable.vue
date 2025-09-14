@@ -1,5 +1,5 @@
 <script lang="tsx" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import * as XLSX from 'xlsx';
 import MultiFileInput from './MultiFileInput.vue';
 import { inventoryTableKeys, InventoryLabels } from '~/schemas/inventory';
@@ -8,12 +8,12 @@ import { addInventoryInfo, genEmptyInventoryInfo, getInventoryInfo, removeInvent
 
 import type { InventoryInfoT } from '~/types/inventory';
 import { ElDropdown, ElDropdownItem, ElDropdownMenu, ElMessage, ElMessageBox, type UploadFile } from 'element-plus';
+import WhDialog from './WhDialog';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { downloadFile, getType } from '~/helpers/utils';
 import { throttle } from 'lodash-es';
 import type { FileInfoT } from 'shared';
 import { UploadFilled } from '@element-plus/icons-vue';
-import { useLock } from '~/composables/useLock';
 
 const data = ref();
 async function updateData() {
@@ -170,23 +170,6 @@ function abortPatch() {
   closePatchDialog();
 }
 
-
-const { lock, unLock } = useLock('scroll');
-watch(addDialogVisible, (visible) => {
-  if (visible) {
-    lock();
-  } else {
-    unLock();
-  }
-});
-watch(patchDialogVisible, (visible) => {
-  if (visible) {
-    lock();
-  } else {
-    unLock();
-  }
-})
-
 const searchVal = ref('');
 const updateSearchData = async (val: string) => {
   data.value = await getInventoryInfo(val);
@@ -293,7 +276,7 @@ async function resolveXlsx(file: UploadFile) {
 
 <template>
   <div class="inventories-table">
-    <ElDialog append-to-body class="record-dlg" v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
+    <WhDialog append-to-body class="record-dlg" v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
       <div class="dlg-body">
         <ElForm :model="addForm" label-width="auto">
           <ElFormItem v-for="item in inventoryTableKeys" :label="InventoryLabels[item]" :key="item">
@@ -308,8 +291,8 @@ async function resolveXlsx(file: UploadFile) {
           >提交</ElButton
         >
       </template>
-    </ElDialog>
-    <ElDialog append-to-body class="record-dlg" v-model="patchDialogVisible" title="批量录入" :close-on-click-modal="false">
+    </WhDialog>
+    <WhDialog append-to-body class="record-dlg" v-model="patchDialogVisible" title="批量录入" :close-on-click-modal="false">
       <div class="dlg-body">
         <ElUpload
           class="patch-upload"
@@ -341,8 +324,8 @@ async function resolveXlsx(file: UploadFile) {
           >提交</ElButton
         >
       </template>
-    </ElDialog>
-    <ElDialog append-to-body v-model="fileDialogVisible" :title="fileOperateTitle" :close-on-click-modal="false">
+    </WhDialog>
+    <WhDialog append-to-body v-model="fileDialogVisible" :title="fileOperateTitle" :close-on-click-modal="false">
       <template v-if="isFileUpload">
         <MultiFileInput v-model:files="uploadFiles" input-mode only-upload />
       </template>
@@ -358,7 +341,7 @@ async function resolveXlsx(file: UploadFile) {
           >{{ fileOperateConfirm }}</ElButton
         >
       </template>
-    </ElDialog>
+    </WhDialog>
     <div class="top">
       <ElInput v-model="searchVal" placeholder="输入需要搜索的关键字" type="search" @change="search" @clear="search">
         <template #append>

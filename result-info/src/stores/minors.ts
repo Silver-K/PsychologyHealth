@@ -1,7 +1,7 @@
 import axios from '~/request/axios';
 import { cloneDeep } from 'lodash-es';
 import { downloadFile, getUniqueId } from "~/helpers/utils";
-import { calcAge, type MinorInfoT, type StaticFile } from 'shared';
+import { type MinorInfoT, type StaticFile } from 'shared';
 import type { Prettier } from "~/types/tools";
 import dayjs from 'dayjs';
 
@@ -73,7 +73,7 @@ export async function addMinorInfo(info: MinorFormInfo) {
   const newInfo = Object.assign(emptyInfo, info);
   const resp = await axios('/api/data/new-minor', {
     method: 'POST',
-    data: calcAge(newInfo),
+    data: newInfo,
   });
   if (resp && resp.status === 200 && resp.data && resp.data.success) {
     return 0;
@@ -85,7 +85,7 @@ export async function addMinorInfo(info: MinorFormInfo) {
 export async function modifyMinorInfo(id: string, data: Partial<MinorInfoT>) {
   const resp = await axios(`/api/data/edit-minor?id=${id}`, {
     method: 'POST',
-    data: calcAge(data),
+    data: data,
   });
   if (resp && resp.status === 200 && resp.data && resp.data.success) {
     return 0;

@@ -1,5 +1,5 @@
 <script lang="tsx" setup>
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { radioLookupMap, type MinorInfoT } from 'shared';
 import { minorsTableKey, MinorsLabels, transformFileServe } from '~/schemas/minors';
 import { generateCols } from '~/helpers/table';
@@ -7,11 +7,11 @@ import { addMinorInfo, modifyMinorInfo, genEmptyMinorInfo, getMinorInfo, removeM
 import MinorInput from '~comp/MinorInput.vue';
 import { isStreetOrCommunityKey, isWarningStatus } from '~/types/minors';
 import { ElMessage, ElMessageBox, type RowClassNameGetter } from 'element-plus';
+import WhDialog from './WhDialog';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { useRouter } from 'vue-router';
 import { throttle } from 'lodash-es';
 import { useStreetCommunity } from '~/stores/street';
-import { useLock } from '~/composables/useLock';
 
 const router = useRouter();
 const data = ref<MinorInfoT[]>([]);
@@ -82,11 +82,8 @@ const rowClass = ({ rowData }: Parameters<RowClassNameGetter<MinorInfoT>>[0]) =>
   }
   return ''
 }
-const { lock, unLock } = useLock('scroll');
+
 const addDialogVisible = ref(false);
-watch(addDialogVisible, (visible) => {
-  visible ? lock() : unLock();
-});
 const addForm = ref(genEmptyMinorInfo());
 const STASH = 'whsg/stash/input-minor';
 function openAddDialog() {
@@ -171,7 +168,7 @@ async function protect(item: MinorInfoT) {
 
 <template>
   <div class="minors-table">
-    <ElDialog class="record-dlg" append-to-body v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
+    <WhDialog class="record-dlg" append-to-body v-model="addDialogVisible" title="录入信息" :close-on-click-modal="false">
       <div class="dlg-body">
         <MinorInput input-mode v-model:form="addForm" />
       </div>      
@@ -182,7 +179,7 @@ async function protect(item: MinorInfoT) {
           >提交</ElButton
         >
       </template>
-    </ElDialog>
+    </WhDialog>
     <div class="top">
       <ElInput v-model="searchVal" type="search" placeholder="输入需要搜索的关键字" @change="search">
         <template #append>

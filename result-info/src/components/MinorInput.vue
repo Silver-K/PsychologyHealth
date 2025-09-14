@@ -101,6 +101,11 @@ const getOptions = (key: FormKey) => {
 const onDisable = (date: Date) => {
   return date.getTime() > Date.now();
 }
+const getWarningStatusClass = (status: 0 | 1 | 2 | 3) => {
+  const colorClass = 'warning-ball';
+  const colorBall = ['green', 'yellow', 'orange', 'red'];
+  return [colorClass, colorBall[status]].join(' ');
+}
 
 // 'input' | 'select' | 'date' | 'radio' | 'textarea' | 'textareas' | 'file' | 'complex'
 const componentsMap = {
@@ -156,7 +161,7 @@ const infoCompMap = {
   },
   radio: (key: FormKey) => {
     return (
-      <span>{transformShowText(key)}</span>
+      <span>{transformShowText(key)}{ key === 'warningStatus' ? <span class={getWarningStatusClass(form.value[key])}></span> : null}</span>
     )    
   },
   textarea: (key: FormKey) => {
@@ -235,6 +240,28 @@ const downloadDetail = () => {
   + .btn {
     margin-top: 12px;
     margin-left: 0px;
+  }
+}
+:deep(.warning-ball) {
+  display: inline-flex;
+  margin-left: 8px;
+  border-radius: 100px;
+  width: 1em;
+  height: 1em;
+  vertical-align: -2px;
+  background-color: var(--color);
+
+  &.green {
+    --color: #00C853;
+  }
+  &.yellow {
+    --color: #FFEB3B;
+  }
+  &.orange {
+    --color: #FF9800;
+  }
+  &.red {
+    --color: #F44336;
   }
 }
 </style>

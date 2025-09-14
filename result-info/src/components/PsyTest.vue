@@ -5,6 +5,7 @@ import LineChart from '~comp/LineChart.vue';
 import MultiFileInput from '~comp/MultiFileInput.vue';
 import { computed, ref, watch } from 'vue';
 import type { FormInstance } from 'element-plus';
+import WhDialog from './WhDialog';
 import { downloadFile, getType } from '~/helpers/utils';
 
 type ComposeKeys = keyof ComposePsyData;
@@ -186,7 +187,7 @@ const preview = (file: FileServe) => {
 
 <template>
   <div class="psy-test-group">
-    <ElDialog v-model="operatorDlgOpen" append-to-body :close-on-click-modal="false" :title="dlgTitle">
+    <WhDialog v-model="operatorDlgOpen" append-to-body :close-on-click-modal="false" :title="dlgTitle">
       <template v-if="!isToDownload">
         <ElForm class="form" ref="formRef" :model="form" label-width="auto">
           <ElFormItem v-if="operateType === 'edit'" label="要编辑的数据">
@@ -224,7 +225,7 @@ const preview = (file: FileServe) => {
         </template>
         <ElButton v-else type="danger" @click="downloadSelectedFiles">下载选中的文件</ElButton>
       </template>
-    </ElDialog>
+    </WhDialog>
     <div class="test-section" v-for="(testItem, property) in props" :key="property">
       <h4 class="title">{{ PsyTestLabels[property] }}</h4>
       <div class="operators">

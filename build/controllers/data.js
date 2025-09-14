@@ -1,6 +1,6 @@
 const { nanoid } = require('nanoid');
 const { dataControl, docxtemplate } = require('../utils/helper');
-const { textifyData, StaticsLabels } = require('shared');
+const { textifyData, StaticsLabels, calcAge } = require('shared');
 const dayjs = require('dayjs');
 const FORMAT = 'YYYY/MM';
 
@@ -29,7 +29,7 @@ exports.getMinorsInfo = async (req, res, next) => {
           return acc;
         }, void 0);
         if (!filter && !searchVal) {
-          return result ? result : [];
+          return result ? result.map(calcAge) : [];
         }
         let filterdData = result;
         if (searchVal) {
@@ -63,7 +63,8 @@ exports.getMinorsInfo = async (req, res, next) => {
             })
           });
         }  
-        return filterdData
+        // 计算年龄
+        return filterdData.map(calcAge)
       } else {
         return []
       }
@@ -503,7 +504,7 @@ exports.downloadMinorInfo = async (req, res, next) => {
     if (data) {
       const textData = textifyData({
         exportDate: dayjs(Date.now()).format('YYYY/MM/DD'),
-        ...data,
+        ...calcAge(data),
         street: streetMap[data.street],
         community: communityMap[data.community],
       });

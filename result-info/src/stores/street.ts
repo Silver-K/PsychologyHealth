@@ -1,7 +1,9 @@
 import axios from "~/request/axios";
 import { reactive } from "vue";
 import type { StreetInfo, CommunityInfo } from "~/types/street";
+import { promiseWithResolvers } from "~/helpers/promise";
 
+const { promise: getStreetPromise, resolve } = promiseWithResolvers<StreetInfo[]>();
 let inited = false;
 const StreetMap: Record<string, StreetInfo> = reactive({});
 const CommunityMap: Record<string, CommunityInfo> = reactive({});
@@ -13,8 +15,9 @@ type RespData = {
 }
 export async function getStreetsAndCommunities() {
   if (inited) {
-    return streets;
+    return getStreetPromise;
   }
+  inited = true;
   const resp = await axios<RespData>('/api/data/get-street', {
     method: 'GET',
   });
@@ -28,10 +31,12 @@ export async function getStreetsAndCommunities() {
         });
       }
     }
-    inited = true;
+    streets.length = 0;
     streets.push(...data.streets);
-    return data.streets;
+    resolve(data.streets);
+    return getStreetPromise;
   } else {
+    inited = false;
     return [] as StreetInfo[];
   }
 }

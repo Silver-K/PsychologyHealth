@@ -105,7 +105,6 @@ function setPageTransition() {
 const { getLocker } = useLock('scroll');
 provide('page-down', () => {
   const isLocked = getLocker();
-  console.log(isLocked);
   if (isLocked) {
     return;
   }

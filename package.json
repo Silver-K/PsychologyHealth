@@ -8,10 +8,12 @@
     "build:fronted": "pnpm --filter result-info build",
     "build_server:backend": "pnpm build:fronted && pnpm build:static && pnpm start:backend",
     "start:backend": "cd build && node server.js",
-    "release": "pnpm del && pnpm zip",
     "build:static": "cd build && rmdir /s /q static && cd .. && mkdir .\\build\\static && xcopy .\\result-info\\dist .\\build\\static /s",
     "del": "del system.zip",
-    "zip": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules -xr!build\\database -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc"
+    "zip-database": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules .\\database -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc",
+    "zip-nodata": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules -xr!.\\database\\* -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc",
+    "release-nodata": "pnpm del && pnpm zip-nodata",
+    "release-data": "pnpm del && pnpm zip-database"
   },
   "keywords": [],
   "author": "",
