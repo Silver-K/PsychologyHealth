@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getMinorsInfo,
   newMinorInfo,
+  newSomeMinorInfo,
   editMinorInfo,
   removeMinorInfo,
   newPsyTestInfo,
@@ -22,6 +23,7 @@ const {
 
 router.post("/get-minors", getMinorsInfo);
 router.post("/new-minor", newMinorInfo);
+router.post("/new-patch-minor", newSomeMinorInfo);
 router.post("/edit-minor", editMinorInfo);
 router.post("/remove-minor", removeMinorInfo);
 router.post("/new-psytest", newPsyTestInfo);

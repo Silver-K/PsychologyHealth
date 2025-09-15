@@ -370,7 +370,7 @@ async function resolveXlsx(file: UploadFile) {
 
 <style lang="scss" scoped>
 .table {
-  height: calc(100 * var(--vh) - 60px);
+  height: calc(100 * var(--vh) - 100px);
   margin-top: 16px;
 }
 .dlg-body {

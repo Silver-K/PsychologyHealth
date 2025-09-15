@@ -28,6 +28,7 @@ export async function getStreetsAndCommunities() {
       if (Array.isArray(data[key])) {
         data[key].forEach((item) => {
           map[item.id] = item;
+          map[item.name] = item;
         });
       }
     }

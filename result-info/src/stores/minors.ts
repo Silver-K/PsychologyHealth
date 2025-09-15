@@ -82,6 +82,18 @@ export async function addMinorInfo(info: MinorFormInfo) {
   return 1;
 }
 
+export async function patchMinorInfo(infos: MinorFormInfo[]) {
+  const resp = await axios('/api/data/new-patch-minor', {
+    method: 'POST',
+    data: infos,
+  });
+  if (resp && resp.status === 200 && resp.data && resp.data.success) {
+    return 0;
+  }
+  
+  return 1;
+}
+
 export async function modifyMinorInfo(id: string, data: Partial<MinorInfoT>) {
   const resp = await axios(`/api/data/edit-minor?id=${id}`, {
     method: 'POST',

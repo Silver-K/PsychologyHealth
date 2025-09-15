@@ -1,21 +1,24 @@
 <script lang="tsx" setup>
 import { computed, ref } from 'vue';
+import * as XLSX from 'xlsx';
+import dayjs from 'dayjs';
 import { radioLookupMap, type MinorInfoT } from 'shared';
-import { minorsTableKey, MinorsLabels, transformFileServe } from '~/schemas/minors';
+import { minorsTableKey, MinorsLabels, transformFileServe, patchInfoKey } from '~/schemas/minors';
 import { generateCols } from '~/helpers/table';
-import { addMinorInfo, modifyMinorInfo, genEmptyMinorInfo, getMinorInfo, removeMinorItem } from '~/stores/minors';
+import { addMinorInfo, modifyMinorInfo, genEmptyMinorInfo, getMinorInfo, removeMinorItem, patchMinorInfo } from '~/stores/minors';
 import MinorInput from '~comp/MinorInput.vue';
 import { isStreetOrCommunityKey, isWarningStatus } from '~/types/minors';
-import { ElMessage, ElMessageBox, type RowClassNameGetter } from 'element-plus';
+import { ElMessage, ElMessageBox, type RowClassNameGetter, type UploadFile } from 'element-plus';
 import WhDialog from './WhDialog.vue';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
 import { useRouter } from 'vue-router';
 import { throttle } from 'lodash-es';
 import { useStreetCommunity } from '~/stores/street';
+import { UploadFilled } from '@element-plus/icons-vue';
 
 const router = useRouter();
 const data = ref<MinorInfoT[]>([]);
-const { streets, getNameByCommunityId, getNameByStreetId } = useStreetCommunity();
+const { streets, getNameByCommunityId, getNameByStreetId, StreetMap, CommunityMap, ensureStreetCommunityData } = useStreetCommunity();
 const streetInited = computed(() => !!streets.length);
 async function updateData() {
   data.value = await getMinorInfo();
@@ -114,6 +117,61 @@ function saveAdd() {
     ElMessage.success("暂存成功");
   }
 }
+
+const patchDialogVisible = ref(false);
+const patchForm = ref<Array<Record<string, string>>>([]);
+function openPatchDialog() {
+  patchDialogVisible.value = true;
+}
+function closePatchDialog() {
+  patchDialogVisible.value = false;
+}
+function resetPatchDialog() {
+  patchForm.value = [];
+}
+function abortPatch() {
+  resetPatchDialog();
+  closePatchDialog();
+}
+const currentShowPatchFormIndex = ref(1);
+function equalsMinorKeyLabel(obj: Record<string, string>) {
+  return Object.keys(obj).some((key) => obj[key] === MinorsLabels[key as keyof typeof MinorsLabels]);
+}
+function formatDate(day: number) {
+  const start = dayjs(new Date('1899/12/30'));
+  return start.add(day, 'day').format('YYYY/MM/DD');
+}
+function transformExcelTime(info: Record<string, string>) {
+  const result = { ...info };
+  if (typeof info.birthday === 'number') {
+    result.birthday = formatDate(info.birthday);
+  }
+  if (typeof info.guardianBirthday === 'number') {
+    result.guardianBirthday = formatDate(info.guardianBirthday);
+  }
+  return result;
+}
+async function resolveXlsx(file: UploadFile) {
+  const { raw } = file;
+  if (!raw) {
+    return;
+  }
+
+  const buffer = await raw.arrayBuffer();
+  const wb = XLSX.read(buffer, { type: 'buffer' });
+  const headers = patchInfoKey.slice();
+  patchForm.value = wb.SheetNames.map((n) => {
+    const ws = wb.Sheets[n];
+    const json = XLSX.utils.sheet_to_json(ws, {
+      header: headers
+    });
+    return json;
+  }).filter((arr) => arr.length).flat().filter((item) => !equalsMinorKeyLabel(item as Record<string, string>)).map((item) => {
+    // birthday/guardianBirthday 需要变成YYYY/MM/DD格式
+    return transformExcelTime(item as Record<string, string>);
+  });
+}
+
 async function handleAddMinorInfo() {
   addForm.value = transformFileServe(addForm.value);
   const result = await addMinorInfo(addForm.value);
@@ -131,6 +189,55 @@ async function handleAddMinorInfo() {
     })
   }
   data.value = await getMinorInfo();
+}
+function toServeFormat(origin: Record<string, string>) {
+  // registratedWuhou 转变成0 | 1 -> 是 | 否
+  // 街道和社区 转变成ID
+  // 预警状态 转变成 0 1 2 3
+  const warningStatus = Math.max(0, radioLookupMap.warningStatus.findIndex((c) => c === origin.warningStatus)) as 0 | 1 | 2 | 3;
+  const registratedWuhou = origin.registratedWuhou === '是' ? 0 : 1;
+  const result = {
+    ...genEmptyMinorInfo(),
+    ...origin,
+    registratedWuhou,
+    street: StreetMap[origin.street].id,
+    community: CommunityMap[origin.community].id,
+    warningStatus
+  } as MinorInfoT;
+  return result;
+}
+function checkStreetCommunity() {
+  return patchForm.value.findIndex((item) => {
+    return !StreetMap[item.street] || !CommunityMap[item.community];
+  });
+}
+async function handlePatchMinorInfo() {
+  await ensureStreetCommunityData();
+  const index = checkStreetCommunity();
+  if (index > -1) {
+    currentShowPatchFormIndex.value = index + 1;
+    ElMessage({
+      message: '当前页有未知的街道或社区名称，请修正后提交',
+      type: 'error',
+      duration: 5000,
+    });
+    return;
+  }
+  const result = await patchMinorInfo(patchForm.value.map((item) => toServeFormat(item)));
+  if (result === 0) {
+    ElMessage({
+      message: '录入成功',
+      type: 'success'
+    });
+    closePatchDialog();
+    resetPatchDialog();
+  } else {
+    ElMessage({
+      message: '录入失败',
+      type: 'error',
+    })
+  }
+  search();
 }
 
 const searchVal = ref('');
@@ -180,6 +287,43 @@ async function protect(item: MinorInfoT) {
         >
       </template>
     </WhDialog>
+    <WhDialog append-to-body class="record-dlg" v-model="patchDialogVisible" title="批量录入" :close-on-click-modal="false">
+      <div class="dlg-body">
+        <ElUpload
+          v-if="!patchForm.length"
+          class="patch-upload"
+          drag
+          accept=".xlsx"
+          :on-change="resolveXlsx"
+          :auto-upload="false"
+        >
+          <ElIcon class="el-icon--upload"><UploadFilled /></ElIcon>
+          <div class="el-upload__text">
+            拖拽文件到此处或点击此处选择文件（仅支持xlsx文件）
+          </div>
+        </ElUpload>
+        <div v-else class="record-form">
+          <div class="record-form-title">
+            <span>量表</span>
+            <span>{{ currentShowPatchFormIndex }}</span>
+          </div>
+          <ElForm class="record-form__inner" label-width="auto">
+            <ElFormItem v-for="item in patchInfoKey" :label="MinorsLabels[item]" :key="item">
+              <ElInput v-model="patchForm[currentShowPatchFormIndex - 1][item]"/>
+            </ElFormItem>
+          </ElForm>
+        </div>       
+      </div>      
+      <template #footer>
+        <div v-if="patchForm.length" class="patch-form-pager">
+          <ElPagination v-model:current-page="currentShowPatchFormIndex" :page-size="1" :total="patchForm.length" layout="pager" />
+        </div>        
+        <ElButton class="opt-btn" @click="abortPatch">放弃</ElButton>
+        <ElButton type="primary" class="opt-btn" @click="handlePatchMinorInfo"
+          >提交</ElButton
+        >
+      </template>
+    </WhDialog>
     <div class="top">
       <ElInput v-model="searchVal" type="search" placeholder="输入需要搜索的关键字" @change="search">
         <template #append>
@@ -188,6 +332,7 @@ async function protect(item: MinorInfoT) {
       </ElInput>
 
       <ElButton class="record-btn" type="primary" @click="openAddDialog">录入</ElButton>
+      <ElButton class="record-btn" type="success" @click="openPatchDialog">批量录入</ElButton>
     </div>
     <div v-if="streetInited" class="table">
       <ElAutoResizer>
@@ -208,7 +353,7 @@ async function protect(item: MinorInfoT) {
 
 <style lang="scss" scoped>
 .table {
-  height: calc(100 * var(--vh) - 60px);
+  height: calc(100 * var(--vh) - 100px);
   margin-top: 16px;
 
   :deep(.is-protect) {

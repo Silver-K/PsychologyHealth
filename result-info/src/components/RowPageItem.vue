@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { inject, onUnmounted, ref } from 'vue';
+import { debounce } from 'lodash-es';
 
 const pageDown = inject('page-down', () => {
   console.log('page down');
@@ -9,49 +10,53 @@ const pageUp = inject('page-up', () => {
 });
 const isActive = inject<(dom: HTMLDivElement) => boolean>('active-index', () => { return false });
 const contRef = ref<HTMLDivElement>();
-let lastScrollTop = 0;
-let maxScrollHeight = -1;
-let confirmPageDown = false;
-let confirmPageUp = false;
-const handleScroll = () => {
-  if (!contRef.value || !isActive(contRef.value)) {
-    return;
-  }
-  const sTop = contRef.value.scrollTop;
-  maxScrollHeight = contRef.value.scrollHeight - contRef.value.clientHeight;
-  const checkBottom = Math.abs(maxScrollHeight - sTop) < 2;
-  const checkTop = Math.abs(sTop - 0) < 2;
-
-  if (checkBottom && lastScrollTop <= sTop) {
-    confirmPageDown = true;
-  }
-  if (checkTop && lastScrollTop >= sTop) {
-    confirmPageUp = true;
-  }
-  if (!checkBottom && !checkTop) {
-    confirmPageDown = false;
-    confirmPageUp = false;
-  }
-  lastScrollTop = sTop;
+let scrollable = false;
+let doubleCheck: 'up' | 'down' | 'none' = 'none';
+function getMaxScrollHeight() {
+  const scrollHeight = contRef.value ? contRef.value.scrollHeight - contRef.value.clientHeight : 0;
+  scrollable = scrollHeight > 0;
+  return scrollHeight;
 }
-function onWheel(evt: WheelEvent) {
+
+function delayTo(fn: () => void) {
+  setTimeout(fn);
+}
+function forPageUp() {
   if (!contRef.value || !isActive(contRef.value)) {
     return;
   }
+  const scrollTop = contRef.value.scrollTop
+  if (doubleCheck === 'up' && (!scrollable || scrollTop === 0)) {
+    delayTo(pageUp);
+    doubleCheck = 'none';
+  } else if ((!scrollable || scrollTop === 0) && doubleCheck !== 'up') {
+    doubleCheck = 'up';
+  }
+}
+function forPageDown() {
+  if (!contRef.value || !isActive(contRef.value)) {
+    return;
+  }
+  const maxScrollHeight = getMaxScrollHeight();
+  const scrollTop = contRef.value.scrollTop;
+  if (doubleCheck === 'down' && (!scrollable || scrollTop === maxScrollHeight)) {
+    delayTo(pageDown);
+    doubleCheck = 'none';
+  } else if ((!scrollable || scrollTop === maxScrollHeight) && doubleCheck !== 'down') {
+    doubleCheck = 'down';
+  }
+}
+function _onWheel(evt: WheelEvent) {
+
   const { deltaY } = evt;
   // deltaY > 0 滑轮向下
   if (deltaY < 0) {
-    if (confirmPageUp || lastScrollTop === 0) {
-      pageUp();
-      confirmPageUp = false;
-    }
+    forPageUp();
   } else {
-    if (confirmPageDown || (maxScrollHeight !== 0 && lastScrollTop === maxScrollHeight)) {
-      pageDown();
-      confirmPageDown = false;
-    }
+    forPageDown();
   }
 }
+const onWheel = debounce(_onWheel, 160);
 window.addEventListener('wheel', onWheel);
 function handleKeyUp(evt: KeyboardEvent) {
   if (!contRef.value || !isActive(contRef.value)) {
@@ -59,16 +64,10 @@ function handleKeyUp(evt: KeyboardEvent) {
   }
   const { key, ctrlKey, altKey } = evt;
   if (key === 'ArrowUp' && !ctrlKey && !altKey) {
-    if (confirmPageUp) {
-      pageUp();
-      confirmPageUp = false;
-    }
+    forPageUp();
   }
   if (key === 'ArrowDown' && !ctrlKey && !altKey) {
-    if (confirmPageDown) {
-      pageDown();
-      confirmPageDown = false;
-    }
+    forPageDown();
   }
 }
 window.addEventListener('keyup', handleKeyUp);
@@ -80,7 +79,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div ref="contRef" class="row-page-item" @scroll="handleScroll">
+  <div ref="contRef" class="row-page-item">
     <slot></slot>
   </div>
 </template>

@@ -166,6 +166,27 @@ export const minorsInfoKey = [
   'otherServer'
 ] as const;
 
+export const patchInfoKey = [
+  'name',
+  'registratedWuhou',
+  'street',
+  'community',
+  'warningStatus',
+  'birthday',
+  'gender',
+  'guardianName',
+  'guardianBirthday',
+  'guardianGender',
+  'guardianContact',
+  'relationship',
+  'school',
+  'grade',
+  'contact',
+  'detail',
+  'lifeEvent',
+  'serveCount'
+] as const;
+
 export const PsyTestLabels = {
   synthesisPsyHealth: '心理健康（综合）',
   anxiety: '焦虑',

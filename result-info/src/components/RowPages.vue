@@ -87,16 +87,18 @@ watch(index, (idx) => {
 }, {
   immediate: true
 });
-
+let isTransition = false;
 function setPageTransition() {
   if (!contRef.value) {
     return;
   }
+  isTransition = true;
   contRef.value.style.transition = 'transform .5s ease-in';
   const fn = () => {
     if (!contRef.value) {
       return;
     }
+    isTransition = false;
     contRef.value.style.transition = '';
     contRef.value.removeEventListener('transitionend', fn);
   }
@@ -109,6 +111,7 @@ provide('page-down', () => {
     return;
   }
   setPageTransition();
+
   let calcResult = index.value + 1;
   if (calcResult >= pagesLength) {
     if (props.loop) {
@@ -136,7 +139,7 @@ provide('page-up', () => {
   index.value = calcResult;
 });
 provide('active-index', (activeDom: HTMLDivElement) => {
-  return memChildren[index.value] === activeDom;
+  return isTransition ? false : memChildren[index.value] === activeDom;
 });
 
 let forceHeightChange = false;

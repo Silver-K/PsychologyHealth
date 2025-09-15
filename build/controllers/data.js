@@ -154,6 +154,39 @@ exports.newMinorInfo = async (req, res, next) => {
   }
 }
 
+exports.newSomeMinorInfo = async (req, res, next) => {
+  const { create, edit } = dataControl();
+
+  const data = req.body || { data: [] };
+  const pushData = data.map((item) => ({
+    ...item,
+    id: nanoid(16)
+  }));
+  try {
+    await create('minors', pushData);
+    edit('record', 'record-in', (item) => {
+      const curDate = dayjs(new Date().toString()).format(FORMAT);
+      const found = item.datas.find((i) => i.date === curDate);
+      if (found) {
+        found.value = found.value + pushData.length;
+      } else {
+        item.datas.push({
+          date: curDate,
+          value: pushData.length,
+        });
+      }
+      return item;
+    });
+    res.status(200).json({
+      success: true,
+      data: pushData.map((it) => it.id),
+      message: 'add new minor successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 exports.editMinorInfo = async (req, res, next) => {
   const { edit, onError } = dataControl();
   const data = { ...req.body || {} };

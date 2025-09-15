@@ -143,7 +143,7 @@ a:visited {
 .patch-upload .el-upload-list {
   display: none;
 }
-.record-form {
+.patch-upload + .record-form {
   margin-top: 24px;
 }
 .record-form-title {
@@ -152,6 +152,16 @@ a:visited {
 .record-form__inner {
   margin-top: 12px;
 }
+.patch-form-pager {
+  margin: 12px 0px;
+  display: flex;
+  justify-content: center;
+}
+.patch-form-pager .el-pager .number {
+  border: 1px solid currentColor;
+  margin: 0 4px;
+}
+
 
 .back-btn {
   margin-left: 12px;
