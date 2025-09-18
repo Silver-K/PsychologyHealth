@@ -9,6 +9,7 @@ router.post('/upload/multiple', upload.array('files', 10), fileController.fixFil
 
 // 下载文件
 router.get('/download/:filename', fileController.downloadFile);
+router.get('/download-template', fileController.downloadTemplateFile);
 
 // 获取文件列表
 router.get('/', fileController.getFileList);

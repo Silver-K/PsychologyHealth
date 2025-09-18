@@ -9,10 +9,11 @@ import {
 import { getKeys, prettierNumber } from "~/helpers/utils";
 import { StaticsLabels } from "shared";
 import PieChart from "~comp/PieChart.vue";
-import { themeList } from "~/themes/pie-themes";
+import { themeList, warningThemes } from "~/themes/pie-themes";
 import axios from "~/request/axios";
 import { useStreetCommunity } from "~/stores/street";
 import { SYSTEM_NAME } from "~/constants/main";
+import BarChart from "./BarChart.vue";
 
 const data = ref<MinorInfoT[]>([]);
 
@@ -61,6 +62,7 @@ function transform(
 }
 
 type StaticT = Array<{
+  key: 'warningStatus' | 'street' | 'community' | 'age' | 'gender' | 'tempProtect',
   title: string;
   categoryCount: Array<{
     tag: string;
@@ -75,6 +77,7 @@ watchEffect(async () => {
   getKeys(StaticsLabels).forEach((cur, index) => {
     const title = StaticsLabels[cur];
     statics.value[index] = {
+      key: cur,
       title,
       categoryCount: arr[index] ? transform(cur, arr[index]) : [],
     };
@@ -110,6 +113,24 @@ watchEffect(async () => {
   recordOut.value = await getRecordByMonth("out", month);
 });
 const getSeriesColor = (item: StaticT[number]) => {
+  if (item.key === 'warningStatus') {
+    const result: string[] = [];
+    item.categoryCount.forEach((each) => {
+      if (each.tag === '绿') {
+        result.push(warningThemes[0]);
+      }
+      if (each.tag === '黄') {
+        result.push(warningThemes[1]);
+      }
+      if (each.tag === '橙') {
+        result.push(warningThemes[2]);
+      }
+      if (each.tag === '红') {
+        result.push(warningThemes[3]);
+      }
+    });
+    return result;
+  }
   const index = getKeys(StaticsLabels).findIndex((key) => {
     const value = StaticsLabels[key];
     return value === item.title;
@@ -279,7 +300,14 @@ const particlesOpts = {
           <span class="static-title">{{ item.title }}</span>
         </span>
         <div class="chart-area">
+          <BarChart
+            v-if="item.key === 'age'"
+            :color="getSeriesColor(item)"
+            :data-map="item.categoryCount"
+            :pie-name="item.title"
+          />
           <PieChart
+            v-else
             :color="getSeriesColor(item)"
             :data-map="item.categoryCount"
             :pie-name="item.title"
@@ -304,7 +332,7 @@ const particlesOpts = {
 .layout {
   --h: 120px;
   position: relative;
-  padding: 24px;
+  padding: 128px;
   padding-top: 0px;
   padding-bottom: 64px;
   background-color: #0a0a1a;

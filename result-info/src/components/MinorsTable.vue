@@ -15,6 +15,7 @@ import { useRouter } from 'vue-router';
 import { throttle } from 'lodash-es';
 import { useStreetCommunity } from '~/stores/street';
 import { UploadFilled } from '@element-plus/icons-vue';
+import { downloadFile } from '~/helpers/utils';
 
 const router = useRouter();
 const data = ref<MinorInfoT[]>([]);
@@ -317,7 +318,8 @@ async function protect(item: MinorInfoT) {
       <template #footer>
         <div v-if="patchForm.length" class="patch-form-pager">
           <ElPagination v-model:current-page="currentShowPatchFormIndex" :page-size="1" :total="patchForm.length" layout="pager" />
-        </div>        
+        </div>   
+        <ElButton type="warning" class="opt-btn" @click="downloadFile('/api/files/download-template?type=minors')">下载模板</ElButton>     
         <ElButton class="opt-btn" @click="abortPatch">放弃</ElButton>
         <ElButton type="primary" class="opt-btn" @click="handlePatchMinorInfo"
           >提交</ElButton

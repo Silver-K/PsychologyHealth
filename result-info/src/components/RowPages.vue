@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { provide, ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { provide, ref, computed, onMounted, onUnmounted, watch, onUpdated } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { useLock } from '~/composables/useLock';
 
@@ -29,7 +29,7 @@ const headHeight = ref(0);
 const currentOffsetTop = computed(() => {
   return index.value === 0 ? 0 : heightMemList.value.filter((_, ind) => ind < index.value).reduce((acc, cur) => {
     return acc + cur;
-  }, 0);
+  }, 1);
 });
 let pagesLength = 0;
 
@@ -111,7 +111,6 @@ provide('page-down', () => {
     return;
   }
   setPageTransition();
-
   let calcResult = index.value + 1;
   if (calcResult >= pagesLength) {
     if (props.loop) {
@@ -141,7 +140,14 @@ provide('page-up', () => {
 provide('active-index', (activeDom: HTMLDivElement) => {
   return isTransition ? false : memChildren[index.value] === activeDom;
 });
-
+function updateMemChildren() {
+  if (!contRef.value) {
+    return [];
+  }
+  const children = Array.from(contRef.value.children).filter((dom) => dom.classList.contains('row-page-item')) as HTMLDivElement[];
+  memChildren = children.slice();
+  return children;
+}
 let forceHeightChange = false;
 let delayTimeout = 0;
 let ob: ResizeObserver | null = new ResizeObserver(() => {
@@ -155,7 +161,7 @@ let ob: ResizeObserver | null = new ResizeObserver(() => {
     if (!contRef.value) {
       return;
     }
-    const children = Array.from(contRef.value.children).filter((dom) => dom.classList.contains('row-page-item')) as HTMLDivElement[];
+    const children = updateMemChildren();
     pagesLength = children.length;
     if (pagesLength === 0) {
       return;
@@ -164,7 +170,6 @@ let ob: ResizeObserver | null = new ResizeObserver(() => {
       index.value = pagesLength - 1;
     }
     heightMemList.value = children.map((child) => child.clientHeight);
-    memChildren = children.slice();
     const height = heightMemList.value[index.value];
     headHeight.value = index.value === 0 ? 0 : heightMemList.value[index.value - 1];
     currentHeight.value = height;
@@ -177,6 +182,9 @@ onMounted(() => {
     contRef.value.style.transition = 'none';
   }
 });
+onUpdated(() => {
+  updateMemChildren();
+})
 onUnmounted(() => {
   ob?.disconnect();
   ob = null;
@@ -184,7 +192,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="row-pages" :style="{ '--row-page-root-height': `${currentHeight}`, height: `${currentHeight}px` }">
+  <div class="row-pages" :style="{ height: `${currentHeight}px` }">
     <Transition>
       <div v-show="pageTitleShow" class="row-page-title">{{ pageTitle }}</div>
     </Transition>
@@ -198,6 +206,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .row-pages {
   overflow: hidden;
+  min-height: calc(100 * var(--vh));
 }
 .row-page-title {
   position: fixed;

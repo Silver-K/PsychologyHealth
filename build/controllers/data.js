@@ -88,7 +88,7 @@ exports.getMinorsCategoryCount = async (req, res, next) => {
     const result = await lookup('minors', (result) => {
       return Object.keys(StaticsLabels).map((category) => {
         const categoryMap = result.reduce((acc, cur) => {
-          const values = cur[category];
+          const values = category === 'age' ? calcAge(cur).age : cur[category];
           const key = typeof values === 'boolean' 
           ?  values === true ? '是' : '否'
           : String(values);

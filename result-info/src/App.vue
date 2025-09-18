@@ -46,11 +46,9 @@ router.afterEach((to) => {
 <template>
   <RouterView>
     <template #default="{ Component }">
-      <KeepAlive>
-        <Transition name="page-fade">
-          <component :is="Component"></component>
-        </Transition>
-      </KeepAlive>
+      <Transition name="page-fade">
+        <component :is="Component"></component>
+      </Transition>
     </template>
   </RouterView>
 </template>

@@ -3,6 +3,7 @@ const fsSync = require('fs');
 const path = require('path');
 
 const uploadDir = path.resolve(__dirname, '..', process.env.UPLOAD_DIR || './uploads');
+const templateDir = path.resolve(__dirname, '..', process.env.TEMPLATE_DIR || './template');
 
 // 文件名编码问题
 exports.fixFileNameEncoding = (req, res, next) => {
@@ -68,8 +69,8 @@ exports.downloadFile = async (req, res, next) => {
     const fileExists = await fs.access(filePath)
       .then(() => true)
       .catch(() => false);
-    console.log(`file ${filename} not exists`);
     if (!fileExists) {
+      console.log(`file ${filename} not exists`);
       return res.status(404).json({ message: '文件不存在' });
     }
 
@@ -148,6 +149,37 @@ exports.removeFile = async (req, res, next) => {
     } else {
       throw new Error('未获取到filename数组');
     }
+  } catch (error) {
+    next(error);
+  }
+}
+
+exports.downloadTemplateFile = async (req, res, next) => {
+  const { type } = req.query || { type: 'minors' };
+  if (!['minors', 'inventory'].includes(type)) {
+    return res.status(400);
+  }
+  const filePath = path.resolve(templateDir, type === 'minors' ? 'minor.xlsx' : 'inventory.xlsx');
+  try {
+    const fileExists = await fs.access(filePath)
+    .then(() => true)
+    .catch(() => false);
+
+    if (!fileExists) {
+      return res.status(404).json({ message: '文件不存在' });
+    }
+
+    // 设置响应头
+    res.setHeader('Content-Disposition', `attachment;filename=${encodeURIComponent(`${type==='minors' ? '服务对象' : '量表'}(模板)`)}.xlsx`);
+    res.setHeader('Content-Type', 'application/octet-stream');
+
+    // 创建文件流并发送
+    const fileStream = fsSync.createReadStream(filePath);
+    fileStream.pipe(res);
+
+    fileStream.on('error', (err) => {
+      next(err);
+    });
   } catch (error) {
     next(error);
   }

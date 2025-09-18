@@ -58,6 +58,13 @@ export const redThemes = [
   "#7F1D1D",
 ];
 
+export const warningThemes = [
+  greenThemes[2],
+  orangeThemes[0],
+  orangeThemes[3],
+  redThemes[2],
+]
+
 export const themeList = [
   orangeThemes,
   blueThemes,

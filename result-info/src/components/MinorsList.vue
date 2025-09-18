@@ -10,6 +10,8 @@ import MinorsTable from './MinorsTable.vue';
 <style lang="scss" scoped>
 .card {
   padding: 24px;
+  padding-left: 128px;
+  padding-right: 128px;
   background-color: var(--wh-color-bg-light);
 }
 </style>

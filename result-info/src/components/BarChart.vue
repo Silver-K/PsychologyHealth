@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 import * as echarts from 'echarts/core';
-import { TooltipComponent, LegendComponent, type TooltipComponentOption, type LegendComponentOption } from 'echarts/components';
-import { PieChart, type PieSeriesOption } from 'echarts/charts';
+import { TooltipComponent, GridComponent, type GridComponentOption, LegendComponent, type TooltipComponentOption, type LegendComponentOption } from 'echarts/components';
+import { BarChart, type BarSeriesOption } from 'echarts/charts';
 import { UniversalTransition, LabelLayout } from 'echarts/features';
 import { CanvasRenderer } from 'echarts/renderers';
 
-echarts.use([TooltipComponent, PieChart, LegendComponent, CanvasRenderer, LabelLayout, UniversalTransition]);
+echarts.use([TooltipComponent,GridComponent, BarChart, LegendComponent, CanvasRenderer, LabelLayout, UniversalTransition]);
 
 type EChartsOption = echarts.ComposeOption<
   | TooltipComponentOption 
-  | PieSeriesOption
+  | BarSeriesOption
   | LegendComponentOption
+  | GridComponentOption
 >;
 
 const echartRef = ref();
@@ -34,10 +35,6 @@ watch(echartRef, (payload) => {
     const option: EChartsOption = {
       tooltip: {
         trigger: 'item',
-        formatter: (param: any) => {
-          const { seriesName, data, percent } = param;
-          return `${seriesName}<br>${data.name}: ${data.value} (${percent}%)`
-        }
       },
       legend: {
         orient: 'vertical',
@@ -47,31 +44,42 @@ watch(echartRef, (payload) => {
         }
       },
       color: props.color || void 0,
+      xAxis: {
+        type: 'category',
+        data: props.dataMap.map((e) => e.tag),
+        boundaryGap: true,
+        axisTick: {
+          alignWithLabel: true,
+        },
+        axisLabel: {
+          color: '#eee',
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#eee',
+          }
+        }
+      },
+      yAxis: {
+        type: 'value',
+        minInterval: 1,
+        splitLine: {
+          lineStyle: {
+            color: '#666',
+            type: 'dashed'
+          }
+        },
+        axisLabel: {
+          color: '#eee',
+        }
+      },
       series: [
         {
           name: props.pieName,
-          type: 'pie',
-          radius: ['35%', '70%'],
-          itemStyle: {
-            borderRadius: 8,
-            borderColor: 'rgba(15, 15, 35, 0.8)',
-            borderWidth: 6,
-          },
-          label: {
-            formatter: '{b} : {c}'
-          },
-          data: props.dataMap.map((e, index) => {
-            return {
-              name: e.tag,
-              value: e.value,
-              label: {
-                color: '#eee'
-              },
-              itemStyle: {
-                color: props.color?.[index],
-              }
-            }
-          }),
+          type: 'bar',
+          data: props.dataMap.map((e) =>  e.value),
+          barWidth: 30,
+          barCategoryGap: 30
         }
       ]
     };
@@ -85,28 +93,8 @@ watch(() => props.dataMap, (newData) => {
     series: [
       {
         name: props.pieName,
-        type: 'pie',
-        radius: ['35%', '70%'],
-        itemStyle: {
-          borderRadius: 8,
-          borderColor: 'rgba(15, 15, 35, 0.8)',
-          borderWidth: 6
-        },
-        label: {
-          formatter: '{b} : {c}'
-        },
-        data: newData.map((e, index) => {
-          return {
-            name: e.tag,
-            value: e.value,
-            label: {
-              color: '#eee'
-            },
-            itemStyle: {
-              color: props.color?.[index],
-            }
-          }
-        }),
+        type: 'bar',
+        data: newData.map((e) =>  e.value),
       }
     ]
   })

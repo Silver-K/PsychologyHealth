@@ -105,7 +105,8 @@ const cancel = async () => {
   background-image: url(~/assets/imgs/kvt.webp);
   background-position: center;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: auto 100%;
+  background-color: #000;
 
   height: calc(100 * var(--vh));
   display: flex;

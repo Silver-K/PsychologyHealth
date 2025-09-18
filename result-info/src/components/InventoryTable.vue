@@ -319,6 +319,7 @@ async function resolveXlsx(file: UploadFile) {
         </div>
       </div>      
       <template #footer>
+        <ElButton type="warning" class="opt-btn" @click="downloadFile('/api/files/download-template?type=inventory')">下载模板</ElButton>
         <ElButton class="opt-btn" @click="abortPatch">放弃</ElButton>
         <ElButton type="primary" class="opt-btn" @click="handlePatchInventoryInfo"
           >提交</ElButton
