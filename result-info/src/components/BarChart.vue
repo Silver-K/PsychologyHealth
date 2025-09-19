@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import * as echarts from 'echarts/core';
 import { TooltipComponent, GridComponent, type GridComponentOption, LegendComponent, type TooltipComponentOption, type LegendComponentOption } from 'echarts/components';
 import { BarChart, type BarSeriesOption } from 'echarts/charts';
@@ -29,12 +29,18 @@ interface PieChartPropT {
 }
 const props = defineProps<PieChartPropT>();
 let myChart: echarts.ECharts;
+const total = computed(() => props.dataMap.reduce((acc, e) => acc + e.value, 0));
 watch(echartRef, (payload) => {
   if (payload) {
     myChart = echarts.init(payload);
     const option: EChartsOption = {
       tooltip: {
         trigger: 'item',
+        formatter: (param: any) => {
+          const { seriesName, data } = param;
+          const percent = total.value ? (data / total.value * 100).toFixed(2) : 0;
+          return `${seriesName}<br>${data} (${percent}%)`
+        }
       },
       legend: {
         orient: 'vertical',

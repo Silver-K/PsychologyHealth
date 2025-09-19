@@ -3,6 +3,7 @@ import { cloneDeep } from 'lodash-es';
 import { getUniqueId } from "~/helpers/utils";
 import type { InventoryInfoT } from "~/types/inventory";
 import type { Prettier } from "~/types/tools";
+import { renewAuth } from './auth';
 
 const inventoryInfoRoot: InventoryInfoT = {
   id: '',
@@ -23,6 +24,7 @@ type InventoryFormInfo = Omit<InventoryInfoT, 'id'>;
 export async function addInventoryInfo(info: InventoryFormInfo) {
   const emptyInfo = genEmptyInventoryInfo();
   const newInfo = Object.assign(emptyInfo, info);
+  renewAuth();
   const resp = await axios('/api/data/new-inventory', {
     method: 'POST',
     data: newInfo,
@@ -35,6 +37,7 @@ export async function addInventoryInfo(info: InventoryFormInfo) {
 }
 
 export async function patchInventoryInfo(infos: InventoryFormInfo[]) {
+  renewAuth();
   const resp = await axios('/api/data/new-patch-inventory', {
     method: 'POST',
     data: infos,
@@ -47,6 +50,7 @@ export async function patchInventoryInfo(infos: InventoryFormInfo[]) {
 }
 
 export async function modifyInventoryInfo(id: string, data: Partial<InventoryFormInfo>) {
+  renewAuth();
   const resp = await axios(`/api/data/edit-inventory?id=${id}`, {
     method: 'POST',
     data,
@@ -75,6 +79,7 @@ export async function getInventoryInfo(searchVal?: string, filter?: Prettier<Inv
 }
 
 export async function removeInventoryItem(id: string) {
+  renewAuth();
   const resp = await axios(`/api/data/remove-inventory?id=${id}`, {
     method: 'POST',
   });

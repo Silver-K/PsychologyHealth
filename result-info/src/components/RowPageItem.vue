@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { inject, onUnmounted, ref } from 'vue';
-import { debounce } from 'lodash-es';
 import vIntersect from '~/directives/intersect';
 
 const pageDown = inject('page-down', () => {
@@ -47,18 +46,7 @@ function forPageDown() {
     doubleCheck = 'down';
   }
 }
-function _onWheel(evt: WheelEvent) {
 
-  const { deltaY } = evt;
-  // deltaY > 0 滑轮向下
-  if (deltaY < 0) {
-    forPageUp();
-  } else {
-    forPageDown();
-  }
-}
-const onWheel = debounce(_onWheel, 160);
-window.addEventListener('wheel', onWheel);
 function handleKeyUp(evt: KeyboardEvent) {
   if (!contRef.value || !isActive(contRef.value)) {
     return;
@@ -73,7 +61,6 @@ function handleKeyUp(evt: KeyboardEvent) {
 }
 window.addEventListener('keyup', handleKeyUp);
 onUnmounted(() => {
-  window.removeEventListener('wheel', onWheel);
   window.removeEventListener('keyup', handleKeyUp);
 });
 const isAsyncLoaded = ref(false);

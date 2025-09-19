@@ -4,6 +4,7 @@ import { downloadFile, getUniqueId } from "~/helpers/utils";
 import { type MinorInfoT, type StaticFile } from 'shared';
 import type { Prettier } from "~/types/tools";
 import dayjs from 'dayjs';
+import { renewAuth } from './auth';
 
 const minorInfoRoot: MinorInfoT = {
   id: '',
@@ -71,6 +72,7 @@ type MinorFormInfo = Omit<MinorInfoT, 'id'>;
 export async function addMinorInfo(info: MinorFormInfo) {
   const emptyInfo = genEmptyMinorInfo();
   const newInfo = Object.assign(emptyInfo, info);
+    renewAuth();
   const resp = await axios('/api/data/new-minor', {
     method: 'POST',
     data: newInfo,
@@ -83,6 +85,7 @@ export async function addMinorInfo(info: MinorFormInfo) {
 }
 
 export async function patchMinorInfo(infos: MinorFormInfo[]) {
+  renewAuth();
   const resp = await axios('/api/data/new-patch-minor', {
     method: 'POST',
     data: infos,
@@ -95,6 +98,7 @@ export async function patchMinorInfo(infos: MinorFormInfo[]) {
 }
 
 export async function modifyMinorInfo(id: string, data: Partial<MinorInfoT>) {
+  renewAuth();
   const resp = await axios(`/api/data/edit-minor?id=${id}`, {
     method: 'POST',
     data: data,
@@ -123,6 +127,7 @@ export async function getMinorInfo(searchVal?: string, filter?: Prettier<Partial
 }
 
 export async function removeMinorItem(id: string) {
+  renewAuth();
   const resp = await axios(`/api/data/remove-minor?id=${id}`, {
     method: 'POST',
   });
@@ -133,10 +138,12 @@ export async function removeMinorItem(id: string) {
 }
 
 export async function downloadMinorInfo(id: string) {
+  renewAuth();
   downloadFile(`/api/data/download-minor?id=${id}`);
 }
 
 export async function addPsyTestInfo(id: string, key: string, data: StaticFile) {
+  renewAuth();
   const resp = await axios(`/api/data/new-psytest?id=${id}&key=${key}`, {
     method: 'POST',
     data,
@@ -148,6 +155,7 @@ export async function addPsyTestInfo(id: string, key: string, data: StaticFile) 
 }
 
 export async function editPsyTestInfo(id: string, key: string, editId: string, data: StaticFile) {
+  renewAuth();
   const resp = await axios(`/api/data/edit-psytest?id=${id}&key=${key}&edit=${editId}`, {
     method: 'POST',
     data,

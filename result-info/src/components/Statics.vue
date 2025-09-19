@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { ref } from "vue";
 import { radioLookupMap, type MinorInfoT } from "shared";
 import {
   getMinorInfo,
   getRecordByMonth,
   createRecordDate,
 } from "~/stores/minors";
+import vIntersect from '~/directives/intersect';
 import { getKeys, prettierNumber } from "~/helpers/utils";
 import { StaticsLabels } from "shared";
 import PieChart from "~comp/PieChart.vue";
@@ -70,7 +71,7 @@ type StaticT = Array<{
   }>;
 }>;
 const statics = ref<StaticT>([]);
-watchEffect(async () => {
+async function updateStatics () {
   // StaticsLabels 的顺序，在客户端和服务端必须是一样的，不然会出现问题
   const arr = await getCategoryCount();
   await ensureStreetCommunityData();
@@ -82,11 +83,11 @@ watchEffect(async () => {
       categoryCount: arr[index] ? transform(cur, arr[index]) : [],
     };
   });
-});
+}
 async function getData() {
   data.value = await getMinorInfo();
 }
-getData();
+
 const keyMap: Record<keyof typeof StaticsLabels, string> = {
   street: "icon-location",
   community: "icon-home",
@@ -107,11 +108,11 @@ function getIcon(item: StaticT[number]) {
 const pickMonth = ref(Date.now());
 const recordIn = ref(0);
 const recordOut = ref(0);
-watchEffect(async () => {
+async function updateRecord() {
   const month = createRecordDate(new Date(pickMonth.value));
   recordIn.value = await getRecordByMonth("in", month);
   recordOut.value = await getRecordByMonth("out", month);
-});
+}
 const getSeriesColor = (item: StaticT[number]) => {
   if (item.key === 'warningStatus') {
     const result: string[] = [];
@@ -207,9 +208,17 @@ const particlesOpts = {
   },
   retina_detect: true,
 };
+
+const handleIntersect = (entry: IntersectionObserverEntry) => {
+  if (entry.intersectionRatio > 0) {
+    updateStatics();
+    updateRecord();
+    getData();
+  }
+}
 </script>
 <template>
-  <div class="layout">
+  <div v-intersect="{ callback: handleIntersect, options: { threshold: 0.1 } }" class="layout">
     <vue-particles id="particles" :options="particlesOpts" />
     <div class="top">
       <div class="bg"></div>
