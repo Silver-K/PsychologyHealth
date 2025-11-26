@@ -21,3 +21,9 @@ export function isRegistratedWuhou(key: string | keyof MinorInfoT): key is 'regi
 export function isGender(key: string | keyof MinorInfoT): key is 'gender' | 'guardianGender' {
   return key === 'gender' || key === 'guardianGender';
 }
+export function isBirthday(key: string | keyof MinorInfoT): key is 'birthday' | 'guardianBirthday' {
+  return key === 'birthday' || key === 'guardianBirthday';
+}
+export function isAge(key: string | keyof MinorInfoT): key is 'age' | 'guardianAge' {
+  return key === 'age' || key === 'guardianAge';
+}

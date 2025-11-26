@@ -156,7 +156,7 @@ export async function addPsyTestInfo(id: string, key: string, data: StaticFile) 
 
 export async function editPsyTestInfo(id: string, key: string, editId: string, data: StaticFile) {
   renewAuth();
-  const resp = await axios(`/api/data/edit-psytest?id=${id}&key=${key}&edit=${editId}`, {
+  const resp = await axios(`/api/data/edit-psytest?id=${id}&key=${key}&editId=${editId}`, {
     method: 'POST',
     data,
   });

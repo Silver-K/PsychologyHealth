@@ -7,7 +7,7 @@ import { useStreetCommunity } from '~/stores/street';
 import type { CommunityInfo } from "~/types/street";
 import MultipleTextarea from '~comp/MultipleTextarea.vue';
 import MultiFileInput from '~comp/MultiFileInput.vue';
-import { isCommunityKey, isGender, isRegistratedWuhou, isStreetKey, isTempProtectKey, isWarningStatus } from '~/types/minors';
+import { isAge, isBirthday, isCommunityKey, isGender, isRegistratedWuhou, isStreetKey, isTempProtectKey, isWarningStatus } from '~/types/minors';
 import { radioLookupMap, type MinorInfoT} from 'shared';
 import { cloneDeep } from 'lodash-es';
 import type { Prettier } from '~/types/tools';
@@ -78,8 +78,20 @@ const transformShowText = <T extends keyof MinorInfoT>(key: T) => {
     return radioLookupMap.registratedWuhou[form.value[key]];
   } else if (isGender(key)) {
     return radioLookupMap.gender[form.value[key]];
-  } else {
+  } else if (isBirthday(key)) {
+    const birthday = form.value[key];
+    if (typeof birthday !== 'string' || birthday.includes('Invalid')) {
+      return '-';
+    }
     return form.value[key];
+  } else if (isAge(key)) {
+    const age = form.value[key];
+    if (typeof age !== 'number' || age === 0) {
+      return '-';
+    }
+    return form.value[key];
+  } else {
+    return form.value[key] || '-';
   }
 }
 const communityOptions = computed(() => {
@@ -151,13 +163,13 @@ const componentsMap = {
 }
 const infoCompMap = {
   input: (key: FormKey) => {
-    return (<span>{form.value[key]}</span>);
+    return (<span>{transformShowText(key)}</span>);
   },
   select: (key: FormKey) => {
     return (<span>{transformShowText(key)}</span>)
   },
   date: (key: FormKey) => {
-    return (<span>{form.value[key]}</span>)
+    return (<span>{transformShowText(key)}</span>)
   },
   radio: (key: FormKey) => {
     return (
@@ -165,7 +177,7 @@ const infoCompMap = {
     )    
   },
   textarea: (key: FormKey) => {
-    return (<div class="text-info">{form.value[key]}</div>);
+    return (<div class="text-info">{transformShowText(key)}</div>);
   },
   textareas: (key: FormKey) => {
     return (<MultipleTextarea inputMode={isInputMode.value} v-model={form.value[key]} />);

@@ -64,6 +64,7 @@ exports.uploadFile = async (req, res, next) => {
 exports.downloadFile = async (req, res, next) => {
   try {
     const filename = req.params.filename;
+    console.log(`will download ${filename}`);
     const filePath = path.join(uploadDir, filename);
     // 检查文件是否存在
     const fileExists = await fs.access(filePath)
@@ -73,9 +74,9 @@ exports.downloadFile = async (req, res, next) => {
       console.log(`file ${filename} not exists`);
       return res.status(404).json({ message: '文件不存在' });
     }
-
+    console.log(`file ${filename} exists, start create Content-Disposition: attachment;filename=${encodeURIComponent(filename)}`);
     // 设置响应头
-    res.setHeader('Content-Disposition', `attachment`);
+    res.setHeader('Content-Disposition', `attachment;filename=${encodeURIComponent(filename)}`);
     res.setHeader('Content-Type', 'application/octet-stream');
 
     // 创建文件流并发送
@@ -138,9 +139,11 @@ exports.removeFile = async (req, res, next) => {
           notFiles.push(file);
         }
       }
+      console.log(`${new Date().toString()} -- will remove ${willRemoveFiles.length} files`);
       for (const file of willRemoveFiles) {
         await fs.unlink(path.join(uploadDir, file));
       }
+      console.log(`成功删除${count}个文件${notFiles.length ? `;未找到${notFiles.length}个文件` : ''}`)
       res.status(200).json({
         message: `成功删除${count}个文件${notFiles.length ? `;未找到${notFiles.length}个文件` : ''}`,
         count,
@@ -156,19 +159,22 @@ exports.removeFile = async (req, res, next) => {
 
 exports.downloadTemplateFile = async (req, res, next) => {
   const { type } = req.query || { type: 'minors' };
+  console.log(`${new Date().toString()} -- will download ${type} template file`);
   if (!['minors', 'inventory'].includes(type)) {
+    console.log(`${new Date().toString()} -- ${type} is not valid`);
     return res.status(400);
   }
-  const filePath = path.resolve(templateDir, type === 'minors' ? 'minor.xlsx' : 'inventory.xlsx');
+  const filePath = path.resolve(templateDir, type === 'minors' ? 'minors.xlsx' : 'inventory.xlsx');
   try {
     const fileExists = await fs.access(filePath)
     .then(() => true)
     .catch(() => false);
 
     if (!fileExists) {
+      console.log(`${new Date().toString()} -- file ${filePath} not exists`);
       return res.status(404).json({ message: '文件不存在' });
     }
-
+    console.log(`${new Date().toString()} -- file ${filePath} exists`);
     // 设置响应头
     res.setHeader('Content-Disposition', `attachment;filename=${encodeURIComponent(`${type==='minors' ? '服务对象' : '量表'}(模板)`)}.xlsx`);
     res.setHeader('Content-Type', 'application/octet-stream');

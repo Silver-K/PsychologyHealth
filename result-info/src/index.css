@@ -216,7 +216,7 @@ a:visited {
   left: 0;
   top: 0;
   bottom: 0;
-  width: 24px;
+  width: 64px;
   z-index: 998;
   transition: all ease-out .2s;
 }

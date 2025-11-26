@@ -102,16 +102,15 @@ const dlgTitle = computed(() => {
     return '下载文件';
   }
 });
-const emptyForm = {
+const createEmptyForm = () => ({
   createAt: '',
   tag: '',
   value: 0,
   files: [],
   id: '',
-}
-const form = ref<StaticFile>({
-  ...emptyForm
-});
+})
+
+const form = ref<StaticFile>(createEmptyForm());
 watch([operateTestItem, operateIndex], ([testItems, index]) => {
   if (testItems && testItems[index]) {
     form.value = testItems[index];
@@ -140,7 +139,7 @@ const willDownloadFiles = computed(() => {
 const openAddDataDlg = (key: ComposeKeys) => {
   operateType.value = 'add';
   operateKey.value = key;
-  form.value = { ...emptyForm };
+  form.value = createEmptyForm();
   operatorDlgOpen.value = true;
 }
 const openEditDataDlg = (item: ComposeValue, key: ComposeKeys) => {
@@ -163,7 +162,7 @@ const openDownloadDlg = (item: ComposeValue) => {
   checkAll.value = false;
 }
 const cancelAddOrEdit = () => {
-  form.value = emptyForm;
+  form.value = createEmptyForm();
   operatorDlgOpen.value = false;
 }
 const confirmAddOrEdit = () => {
@@ -173,7 +172,7 @@ const confirmAddOrEdit = () => {
     emits('edit', operateKey.value, form.value);
   }
   operatorDlgOpen.value = false;
-  form.value = emptyForm;
+  form.value = createEmptyForm();
 }
 const downloadSelectedFiles = () => {
   willDownloadFiles.value.forEach((file) => {

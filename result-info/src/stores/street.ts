@@ -45,10 +45,10 @@ export async function getStreetsAndCommunities() {
 export function useStreetCommunity() {
   const promise = getStreetsAndCommunities();
   function getNameByStreetId(id: string) {
-    return StreetMap[id] ? StreetMap[id].name : '';
+    return StreetMap[id] ? StreetMap[id].name : '-';
   }
   function getNameByCommunityId(id: string) {
-    return CommunityMap[id] ? CommunityMap[id].name : '';
+    return CommunityMap[id] ? CommunityMap[id].name : '-';
   }
   async function ensureStreetCommunityData() {
     await promise;

@@ -92,11 +92,12 @@ exports.getMinorsCategoryCount = async (req, res, next) => {
           const key = typeof values === 'boolean' 
           ?  values === true ? '是' : '否'
           : String(values);
-
-          if (acc[key]) {
-            acc[key].push(cur);
-          } else {
-            acc[key] = [cur];
+          if (!!key) {
+            if (acc[key]) {
+              acc[key].push(cur);
+            } else {
+              acc[key] = [cur];
+            }
           }
           return acc;
         }, Object.create(null));
@@ -324,7 +325,7 @@ exports.editPsyTestInfo = async (req, res, next) => {
   } else {
     res.status(400).json({
       success: false,
-      message: `params must include id or key`
+      message: `params must include id or key or editId id:${id} key:${key} editId:${editId}`
     })
   }
 }
