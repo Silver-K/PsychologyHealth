@@ -7,7 +7,7 @@ import { minorsTableKey, MinorsLabels, transformFileServe, patchInfoKey } from '
 import { generateCols } from '~/helpers/table';
 import { addMinorInfo, modifyMinorInfo, genEmptyMinorInfo, getMinorInfo, removeMinorItem, patchMinorInfo } from '~/stores/minors';
 import MinorInput from '~comp/MinorInput.vue';
-import { isStreetOrCommunityKey, isWarningStatus } from '~/types/minors';
+import { isAge, isStreetOrCommunityKey, isWarningStatus } from '~/types/minors';
 import { ElMessage, ElMessageBox, type RowClassNameGetter, type UploadFile } from 'element-plus';
 import WhDialog from './WhDialog.vue';
 import { getLocalStore, removeLocalStore, setLocalStore } from '~/env/storage';
@@ -50,7 +50,11 @@ const cols = generateCols({
       return ({ rowData }: { rowData: MinorInfoT }) => (
         <span>{ radioLookupMap.warningStatus[rowData[key]] }</span>
       )
-    } else  {
+    } else if (isAge(key)) {
+      return ({ rowData }: { rowData: MinorInfoT }) => (
+        <span>{ rowData[key] || '-' }</span>
+      )
+    } else {
       return void 0
     }
   },
