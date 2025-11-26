@@ -13,7 +13,8 @@
     "zip-database": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules .\\database -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc",
     "zip-nodata": "7z a -tzip .\\system.zip .\\build .\\shared -xr!build\\node_modules -xr!.\\database\\* -xr!build\\upload_dir\\* && 7z a -tzip .\\system.zip .\\launcher\\* .\\node package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc",
     "release-nodata": "pnpm del && pnpm zip-nodata",
-    "release-data": "pnpm del && pnpm zip-database"
+    "release-data": "pnpm del && pnpm zip-database",
+    "one-release": "pnpm build:fronted && pnpm build:static && pnpm release-nodata"
   },
   "keywords": [],
   "author": "",
